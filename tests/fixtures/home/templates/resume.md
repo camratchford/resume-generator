@@ -5,7 +5,7 @@
 
 ## SKILLS
 
-%( {{ Skill | join('||') }} )%
+%( {{ Skill | rank_skills | join('||') }} )%
 
 ## WORK EXPERIENCE
 
@@ -16,9 +16,11 @@
 ### {{ exp.title }} at {{ exp.company }}
 {% endif %}
 
-{{ exp.description }}
+{% for detail in exp.details | rank_details -%}
+- {{ detail.description }}
+{% endfor %}
 
-%( {{ exp.skills | join('||') }} )%
+%( {{ exp.skills | rank_skills | join('||') }} )%
 {% endfor %}
 
 ## PROJECTS

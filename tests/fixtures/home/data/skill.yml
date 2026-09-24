@@ -6,3 +6,4 @@
 - name: Terraform
   categories:
     - name: DevOps
+    - name: IaC

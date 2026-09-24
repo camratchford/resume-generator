@@ -134,8 +134,11 @@ class DataImporter:
             model_type = model_name
 
         items_by_primary_key = {}
-        for instance in field_value:
+        has_position_field = "position" in self._model_fields.get(getattr(model_type, "__name__", ""), {})
+        for position, instance in enumerate(field_value):
             if isinstance(instance, Mapping):
+                if has_position_field and "position" not in instance:
+                    instance = {**instance, "position": position}
                 instance = self._coerce_instance_data_types(model_type, instance)
             upserted = self._upsert(model_type, instance)
             items_by_primary_key[self._primary_key_of_instance(upserted)] = upserted

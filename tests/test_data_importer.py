@@ -258,3 +258,29 @@ def test_reimporting_nested_details_does_not_duplicate_them(tmp_path):
     with Session(engine) as session:
         experience = session.get(Experience, {"canonical_name": "job"})
         assert [detail.canonical_name for detail in experience.details] == ["job-first", "job-second"]
+
+
+def test_nested_details_get_their_yaml_position(tmp_path):
+    engine = _make_engine(tmp_path)
+
+    with DataImporter(base_model=Model, engine=engine) as importer:
+        importer.load_data(NESTED_EXPERIENCE, Experience)
+
+    with Session(engine) as session:
+        experience = session.get(Experience, {"canonical_name": "job"})
+        assert [(detail.canonical_name, detail.position) for detail in experience.details] == [
+            ("job-first", 0),
+            ("job-second", 1),
+        ]
+
+
+def test_explicit_positions_override_yaml_order(tmp_path):
+    engine = _make_engine(tmp_path)
+    reordered = NESTED_EXPERIENCE.replace("description: First bullet", "description: First bullet\n      position: 5")
+
+    with DataImporter(base_model=Model, engine=engine) as importer:
+        importer.load_data(reordered, Experience)
+
+    with Session(engine) as session:
+        experience = session.get(Experience, {"canonical_name": "job"})
+        assert [detail.canonical_name for detail in experience.details] == ["job-second", "job-first"]

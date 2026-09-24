@@ -7,6 +7,7 @@ from resume_generator.config import Config
 from resume_generator.data import DBAccessor
 from resume_generator.md import create_markdown_renderer
 from resume_generator.pdf import PDFMetadata, PDFOptions, render_pdf
+from resume_generator.ranking import Ranker
 from resume_generator.resume import Model
 from resume_generator.templates import new_template_environment
 from resume_generator.user_input import prompt_for_variable_values
@@ -27,6 +28,7 @@ def render_resume(
     config: Config,
     generate_html: bool,
     generate_markdown: bool,
+    ranker: Ranker = None,
 ):
     with DBAccessor(base_model=Model, engine=engine) as db_accessor:
         candidates = db_accessor["Candidate"]
@@ -42,6 +44,7 @@ def render_resume(
         jinja2_environment = new_template_environment(
             templates_dir=config.templates_dir,
             db_accessor=db_accessor,
+            ranker=ranker,
         )
 
         markdown_template = jinja2_environment.get_template(template_name)

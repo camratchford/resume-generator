@@ -141,3 +141,9 @@ def test_empty_home_dir_with_all_subdirectories_is_valid(tmp_path):
     home = make_home(tmp_path / "bare-home")
 
     assert Config(manual_home_dir=home).home_dir == home
+
+
+def test_limits_default_to_unlimited(home_dir):
+    config = Config(manual_home_dir=home_dir)
+
+    assert (config.bullets_per_job, config.skills_per_job) == (None, None)

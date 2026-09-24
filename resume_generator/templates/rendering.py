@@ -5,6 +5,7 @@ from jinja2 import FileSystemLoader
 
 from resume_generator.data.accessor import DBAccessor
 from resume_generator.import_functions import get_functions_by_prefix_from_modules
+from resume_generator.ranking import PositionRanker, Ranker
 from resume_generator.templates.environment import TypedVariableEnvironment
 
 
@@ -17,6 +18,7 @@ def new_template_environment(
     trim_func_prefix: bool = True,
     db_accessor: DBAccessor = None,
     globals_mapping: Mapping[str, Any] = None,
+    ranker: Ranker = None,
     **jinja2_env_kwargs,
 ) -> TypedVariableEnvironment:
     """Build a `TypedVariableEnvironment` wired up with filters, tests, and globals.
@@ -43,6 +45,8 @@ def new_template_environment(
             globals, enabling database access from templates.
         globals_mapping: Additional global variables to merge into the
             environment's globals.
+        ranker: Supplies the `rank_details` and `rank_skills` filters.
+            Defaults to `PositionRanker`, which keeps data file order.
         **jinja2_env_kwargs: Additional keyword arguments passed through to
             `TypedVariableEnvironment`/`jinja2.Environment`.
             See [Jinja2.Environment docs](https://jinja.palletsprojects.com/en/stable/api/#jinja2.Environment)
@@ -72,5 +76,8 @@ def new_template_environment(
         environment.globals.update(globals_mapping)
     environment.filters.update(filters_dict)
     environment.tests.update(tests_dict)
+
+    ranker = ranker or PositionRanker()
+    environment.filters.update(rank_details=ranker.rank_details, rank_skills=ranker.rank_skills)
 
     return environment

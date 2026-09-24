@@ -12,6 +12,9 @@ class Config(BYOConfig):
     dry_run: bool = False
     variable_default_values: dict[str, Any] = {}
 
+    bullets_per_job: int | None = None
+    skills_per_job: int | None = None
+
     manual_home_dir: Path | None = None
     manual_templates_dir: Path | None = None
     manual_data_dir: Path | None = None
@@ -55,6 +58,10 @@ class Config(BYOConfig):
             return self.home_dir / "data"
 
         return None
+
+    @property
+    def profiles_dir(self):
+        return self.home_dir / "profiles"
 
     @property
     def css_dir(self):

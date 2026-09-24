@@ -5,6 +5,7 @@ from resume_generator import render_resume as render_resume_module
 from resume_generator.config import Config
 from resume_generator.db import initialize_db
 from resume_generator.import_data import import_yaml_data
+from resume_generator.ranking import CategoryRanker
 from resume_generator.render_resume import render_resume
 from resume_generator.resume import Model
 
@@ -154,3 +155,25 @@ def test_template_without_undeclared_variables_does_not_prompt(
     monkeypatch.setattr(render_resume_module, "prompt_for_variable_values", fail_prompt)
 
     render(config, engine, tmp_path)
+
+
+def test_category_ranking_reorders_and_limits_rendered_bullets(config, engine, tmp_path, captured_pdf_calls):
+    render(config, engine, tmp_path, generate_markdown=True, ranker=CategoryRanker(["DevOps"], details_limit=1))
+
+    markdown = (tmp_path / "Test Candidate - Resume.md").read_text()
+    assert "- Automated test infrastructure." in markdown
+    assert "- Did testing things." not in markdown
+
+
+def test_default_rendering_keeps_every_bullet_in_data_order(config, engine, tmp_path, captured_pdf_calls):
+    render(config, engine, tmp_path, generate_markdown=True)
+
+    markdown = (tmp_path / "Test Candidate - Resume.md").read_text()
+    assert markdown.index("- Did testing things.") < markdown.index("- Automated test infrastructure.")
+
+
+def test_category_ranking_reorders_skill_bubbles(config, engine, tmp_path, captured_pdf_calls):
+    render(config, engine, tmp_path, generate_markdown=True, ranker=CategoryRanker(["IaC"]))
+
+    markdown = (tmp_path / "Test Candidate - Resume.md").read_text()
+    assert "%( Terraform||Python )%" in markdown

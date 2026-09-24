@@ -23,6 +23,7 @@ class ExperienceDetail(Model, table=True):
     __tablename__ = "experience_detail"
     canonical_name: str = Field(default=None, primary_key=True)
     description: str = Field(nullable=False)
+    position: int = Field(default=None, nullable=True)
     experience_canonical_name: str = Field(foreign_key="experience.canonical_name")
     experience: "Experience" = Relationship(back_populates="details")
     skills: list["Skill"] = Relationship(back_populates="experience_details", link_model=ExperienceDetailSkills)
@@ -43,7 +44,9 @@ class Experience(Model, table=True):
     location: str = Field(default=None)
     candidate_name: str = Field(default=None, foreign_key="candidate.name")
     candidate: "Candidate" = Relationship(back_populates="experience")
-    details: list[ExperienceDetail] = Relationship(back_populates="experience")
+    details: list[ExperienceDetail] = Relationship(
+        back_populates="experience", sa_relationship_kwargs={"order_by": "ExperienceDetail.position"}
+    )
 
     projects: list["Project"] = Relationship(back_populates="experience")
 

@@ -4,6 +4,7 @@ from typer.testing import CliRunner
 
 from resume_generator import __main__ as main_module
 from resume_generator.__main__ import cli
+from resume_generator.ranking import CategoryRanker, PositionRanker
 
 runner = CliRunner()
 
@@ -14,7 +15,7 @@ def test_main_command_options_have_unique_flags():
     whichever parameter registered it last, so the earlier ones were unreachable
     from the CLI with no error at startup.
     """
-    click_command = get_command(cli).commands["main"]
+    click_command = get_command(cli).commands["render"]
 
     flag_owner = {}
     for param in click_command.params:
@@ -36,7 +37,7 @@ def captured_render(monkeypatch):
 def invoke(home_dir, tmp_path, *extra_arguments):
     return runner.invoke(
         cli,
-        ["main", str(tmp_path / "out"), "--home-dir", str(home_dir), *extra_arguments],
+        ["render", str(tmp_path / "out"), "--home-dir", str(home_dir), *extra_arguments],
     )
 
 
@@ -121,7 +122,7 @@ def test_dry_run_reaches_config(home_dir, tmp_path, captured_render):
 
 
 def test_nonexistent_home_dir_is_rejected(tmp_path, captured_render):
-    result = runner.invoke(cli, ["main", str(tmp_path / "out"), "--home-dir", str(tmp_path / "missing")])
+    result = runner.invoke(cli, ["render", str(tmp_path / "out"), "--home-dir", str(tmp_path / "missing")])
 
     assert result.exit_code != 0
     assert captured_render == []
@@ -143,3 +144,91 @@ def test_config_path_is_loaded(home_dir, tmp_path, captured_render):
 
     assert result.exit_code == 0, result.output
     assert captured_render[0]["config"].get_by_prefix("metadata", trim_prefix=True) == {"title": "From Flag"}
+
+
+def test_default_ranker_keeps_data_order(home_dir, tmp_path, captured_render):
+    result = invoke(home_dir, tmp_path, "-t", "resume.md", "-s", "resume.css")
+
+    assert result.exit_code == 0, result.output
+    assert isinstance(captured_render[0]["ranker"], PositionRanker)
+
+
+def test_profile_supplies_categories_and_bullet_limit(home_dir, tmp_path, captured_render):
+    result = invoke(home_dir, tmp_path, "-t", "resume.md", "-s", "resume.css", "--profile", "devops")
+
+    assert result.exit_code == 0, result.output
+    ranker = captured_render[0]["ranker"]
+    assert isinstance(ranker, CategoryRanker)
+    assert ranker.category_names == ["DevOps"]
+    assert ranker.details_limit == 1
+    assert ranker.skills_limit == 1
+
+
+def test_categories_option_overrides_profile_categories(home_dir, tmp_path, captured_render):
+    result = invoke(
+        home_dir,
+        tmp_path,
+        "-t",
+        "resume.md",
+        "-s",
+        "resume.css",
+        "-p",
+        "devops",
+        "--categories",
+        " Programming, DevOps ",
+    )
+
+    assert result.exit_code == 0, result.output
+    ranker = captured_render[0]["ranker"]
+    assert ranker.category_names == ["Programming", "DevOps"]
+    assert ranker.details_limit == 1
+
+
+def test_missing_profile_is_rejected_with_available_names(home_dir, tmp_path, captured_render):
+    result = invoke(home_dir, tmp_path, "-t", "resume.md", "-s", "resume.css", "--profile", "nope")
+
+    assert result.exit_code != 0
+    assert "Available profiles: devops" in str(result.exception)
+    assert captured_render == []
+
+
+def test_unknown_category_is_rejected(home_dir, tmp_path, captured_render):
+    result = invoke(home_dir, tmp_path, "-t", "resume.md", "-s", "resume.css", "--categories", "DevOps,Netwerking")
+
+    assert result.exit_code != 0
+    assert "Unknown skill categories: Netwerking" in str(result.exception)
+    assert captured_render == []
+
+
+def test_config_supplies_default_limits(home_dir, tmp_path, captured_render):
+    (home_dir / "config.yml").write_text("bullets_per_job: 3\nskills_per_job: 5\n")
+
+    result = invoke(home_dir, tmp_path, "-t", "resume.md", "-s", "resume.css")
+
+    assert result.exit_code == 0, result.output
+    ranker = captured_render[0]["ranker"]
+    assert (ranker.details_limit, ranker.skills_limit) == (3, 5)
+
+
+def test_profile_limits_override_config_limits(home_dir, tmp_path, captured_render):
+    (home_dir / "config.yml").write_text("bullets_per_job: 3\nskills_per_job: 5\n")
+
+    result = invoke(home_dir, tmp_path, "-t", "resume.md", "-s", "resume.css", "--profile", "devops")
+
+    assert result.exit_code == 0, result.output
+    ranker = captured_render[0]["ranker"]
+    assert (ranker.details_limit, ranker.skills_limit) == (1, 1)
+
+
+def test_extra_option_limit_is_converted_to_a_number(home_dir, tmp_path, captured_render):
+    result = invoke(home_dir, tmp_path, "-t", "resume.md", "-s", "resume.css", "-o", "bullets_per_job=2")
+
+    assert result.exit_code == 0, result.output
+    assert captured_render[0]["ranker"].details_limit == 2
+
+
+def test_non_numeric_limit_is_rejected(home_dir, tmp_path, captured_render):
+    result = invoke(home_dir, tmp_path, "-t", "resume.md", "-s", "resume.css", "-o", "bullets_per_job=lots")
+
+    assert result.exit_code != 0
+    assert "'bullets_per_job' must be a whole number" in str(result.exception)

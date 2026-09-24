@@ -12,7 +12,7 @@ def test_cli_generates_a_pdf(home_dir, tmp_path, monkeypatch):
     result = runner.invoke(
         cli,
         [
-            "main",
+            "render",
             str(out_dir),
             "--home-dir",
             str(home_dir),
@@ -39,7 +39,7 @@ def test_cli_generates_markdown_and_html_intermediaries(home_dir, tmp_path, monk
     result = runner.invoke(
         cli,
         [
-            "main",
+            "render",
             str(out_dir),
             "--home-dir",
             str(home_dir),
@@ -72,7 +72,7 @@ def test_cli_writes_to_an_explicit_pdf_path(home_dir, tmp_path, monkeypatch):
 
     result = runner.invoke(
         cli,
-        ["main", str(out_file), "--home-dir", str(home_dir), "-t", "resume.md", "-s", "resume.css"],
+        ["render", str(out_file), "--home-dir", str(home_dir), "-t", "resume.md", "-s", "resume.css"],
     )
 
     assert result.exit_code == 0, result.output

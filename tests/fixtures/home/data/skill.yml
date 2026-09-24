@@ -1,0 +1,8 @@
+- name: Python
+  categories:
+    - name: DevOps
+    - name: Programming
+
+- name: Terraform
+  categories:
+    - name: DevOps

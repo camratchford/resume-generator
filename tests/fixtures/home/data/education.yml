@@ -1,0 +1,9 @@
+- canonical_name: test-university
+  institution: Test University
+  location: Testville, TS
+  received: Bachelor of Testing
+  date_from: 2010-09-01
+  date_to: 2014-06-01
+  candidate_name: Test Candidate
+  skills:
+    - name: Python

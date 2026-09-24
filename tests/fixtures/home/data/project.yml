@@ -1,0 +1,27 @@
+- canonical_name: test-project
+  name: Test Project
+  href: https://github.com/example/test-project
+  description: A test project.
+  date_from: 2021-01-01
+  date_to: 2021-06-01
+  category_name: Professional
+  candidate_name: Test Candidate
+  education_canonical_name: null
+  experience_canonical_name: test-co-engineer
+  hobby_canonical_name: null
+  skills:
+    - name: Python
+
+- canonical_name: hobby-project
+  name: Hobby Project
+  href: null
+  description: A hobby-linked test project.
+  date_from: 2022-01-01
+  date_to: null
+  category_name: Hobby
+  candidate_name: Test Candidate
+  education_canonical_name: null
+  experience_canonical_name: null
+  hobby_canonical_name: tinkering
+  skills:
+    - name: Python

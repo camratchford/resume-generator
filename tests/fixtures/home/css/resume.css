@@ -1,0 +1,9 @@
+@page {
+    size: Letter;
+    margin: 0.6in;
+}
+
+body {
+    font-family: sans-serif;
+    font-size: 10pt;
+}

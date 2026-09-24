@@ -1,0 +1,8 @@
+- name: Test Candidate
+  short_summary: A short summary for testing.
+  summary: A longer summary for testing.
+  telephone: "15551234567"
+  email: test@example.com
+  linkedin_user: test-candidate
+  github_user: testcandidate
+  webpage_url: https://example.com

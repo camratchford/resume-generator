@@ -1,0 +1,103 @@
+[project]
+name = "resume-generator"
+dynamic = ["version"]
+description = "Another resume generator"
+readme = "README.md"
+requires-python = ">=3.12"
+authors = [
+    {name = "Cam Ratchford", email = "camratchford@gmail.com"},
+]
+license = "MIT"
+license-files = ["LICENSE"]
+
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Natural Language :: English",
+    "Programming Language :: Python",
+    "Programming Language :: Python :: 3 :: Only",
+    "Operating System :: Microsoft :: Windows",
+    "Operating System :: POSIX :: Linux",
+    "Operating System :: MacOS",
+    "Intended Audience :: Developers",
+    "Topic :: Software Development :: Libraries :: Python Modules",
+]
+
+dependencies = [
+    "byoconfig",
+    "typer",
+    "jinja2",
+    "click",
+    "textual",
+    "pyyaml",
+    "sqlmodel",
+    "pydantic",
+    "markdown",
+    "pymdown-extensions",
+    "pygments",
+    "weasyprint",
+]
+
+[project.urls]
+Homepage = "https://github.com/camratchford/resume-generator"
+Source = "https://github.com/camratchford/resume-generator"
+
+[project.scripts]
+"resume-generator" = "resume_generator.__main__:cli"
+
+[project.optional-dependencies]
+development = [
+    "ruff",
+    "isort",
+    "pytest",
+    "pytest-cov",
+]
+
+[build-system]
+requires = ["setuptools", "setuptools-scm"]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools]
+packages = ["resume_generator"]
+package-dir = {"resume_generator" = "resume_generator"}
+
+
+[tool.ruff]
+line-length = 119
+exclude = [
+    "tests/fixtures/**/*"
+]
+
+[tool.ruff.lint]
+select = ["E4", "E7", "E9", "F"]
+ignore = []
+fixable = ["ALL"]
+unfixable = []
+
+[tool.ruff.format]
+quote-style = "double"
+indent-style = "space"
+skip-magic-trailing-comma = false
+line-ending = "auto"
+docstring-code-format = false
+docstring-code-line-length = "dynamic"
+
+[tool.isort]
+profile = "black"
+line_length = 119
+skip_gitignore = true
+
+[tool.pytest.ini_options]
+addopts = "-ra -q"
+testpaths = [
+    "tests",
+]
+
+[tool.coverage.run]
+source = ["resume_generator"]
+branch = true
+
+[tool.coverage.report]
+skip_empty = true
+exclude_lines = [
+    "pragma: no cover",
+]

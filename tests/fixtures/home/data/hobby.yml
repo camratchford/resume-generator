@@ -1,0 +1,8 @@
+- canonical_name: tinkering
+  name: Tinkering
+  description: Building small test projects.
+  date_from: 2015-01-01
+  date_to: null
+  candidate_name: Test Candidate
+  skills:
+    - name: Python

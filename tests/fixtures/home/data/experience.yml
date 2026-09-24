@@ -1,0 +1,30 @@
+- canonical_name: test-co-engineer
+  company: Test Co
+  title: Test Engineer
+  team: Testing
+  href: https://testco.example.com
+  date_from: 2020-01-01
+  date_to: 2023-01-01
+  location: Testville, TS
+  details:
+    - canonical_name: test-co-testing
+      description: Did testing things.
+      skills:
+        - name: Python
+    - canonical_name: test-co-infrastructure
+      description: Automated test infrastructure.
+      skills:
+        - name: Python
+        - name: Terraform
+  candidate_name: Test Candidate
+- canonical_name: test-career-gap
+  title: Career Gap
+  is_career_gap: true
+  date_from: 2023-02-01
+  location: Testville, TS
+  details:
+    - canonical_name: test-career-gap-learning
+      description: Learning new things.
+      skills:
+        - name: Python
+  candidate_name: Test Candidate

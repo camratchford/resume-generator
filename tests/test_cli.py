@@ -232,3 +232,12 @@ def test_non_numeric_limit_is_rejected(home_dir, tmp_path, captured_render):
 
     assert result.exit_code != 0
     assert "'bullets_per_job' must be a whole number" in str(result.exception)
+
+
+def test_empty_config_path_does_not_crash(home_dir, tmp_path, captured_render):
+    empty_config = tmp_path / "empty.yml"
+    empty_config.write_text("")
+
+    result = invoke(home_dir, tmp_path, "-t", "resume.md", "-s", "resume.css", "-c", str(empty_config))
+
+    assert result.exit_code == 0, result.output

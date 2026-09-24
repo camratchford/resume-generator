@@ -1,7 +1,8 @@
 from pathlib import Path
-from typing import Any
+from typing import Any, Mapping
 
 from byoconfig import Config as BYOConfig
+from yaml import safe_load
 
 
 class Config(BYOConfig):
@@ -86,6 +87,20 @@ class Config(BYOConfig):
         required_subpaths = ("templates", "data", "css")
         return [home_dir.joinpath(subpath) for subpath in required_subpaths if not home_dir.joinpath(subpath).exists()]
 
+    @staticmethod
+    def usable_config_file(config_file: Path | None) -> Path | None:
+        if config_file is None:
+            return None
+
+        settings = safe_load(Path(config_file).read_text())
+        if settings is None:
+            return None
+        if not isinstance(settings, Mapping):
+            raise TypeError(
+                f"Config file {config_file} must contain 'key: value' settings - got a {type(settings).__name__}"
+            )
+        return config_file
+
     def __init__(self, **kwargs):
         self.manual_home_dir = kwargs.get("manual_home_dir")
         pdf_keywords = kwargs.pop("pdf_keywords", "")
@@ -103,6 +118,7 @@ class Config(BYOConfig):
             if found_config_files:
                 home_config_file = found_config_files.pop()
 
-        super().__init__(**kwargs, env_prefix=self.env_prefix, file_path=kwargs.get("config_file", home_config_file))
+        config_file = self.usable_config_file(kwargs.get("config_file", home_config_file))
+        super().__init__(**kwargs, env_prefix=self.env_prefix, file_path=config_file)
         self.pdf_keywords = list(self.pdf_keywords)
         self.parse_pdf_keywords(pdf_keywords)

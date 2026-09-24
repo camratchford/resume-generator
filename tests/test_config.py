@@ -147,3 +147,31 @@ def test_limits_default_to_unlimited(home_dir):
     config = Config(manual_home_dir=home_dir)
 
     assert (config.bullets_per_job, config.skills_per_job) == (None, None)
+
+
+@pytest.mark.parametrize("contents", ["", "\n", "# every setting commented out\n# bullets_per_job: 4\n"])
+def test_empty_home_config_file_is_ignored(home_dir, contents):
+    """Regression test: an empty or comment-only config.yml parses to None, which
+    byoconfig tried to iterate with .items(), crashing with an AttributeError.
+    """
+    (home_dir / "config.yml").write_text(contents)
+
+    config = Config(manual_home_dir=home_dir)
+
+    assert config.bullets_per_job is None
+
+
+def test_empty_explicit_config_file_is_ignored(home_dir, tmp_path):
+    empty_config = tmp_path / "empty.yml"
+    empty_config.write_text("")
+
+    config = Config(manual_home_dir=home_dir, config_file=empty_config)
+
+    assert config.bullets_per_job is None
+
+
+def test_config_file_that_is_not_a_mapping_is_rejected(home_dir):
+    (home_dir / "config.yml").write_text("- bullets_per_job\n- 4\n")
+
+    with pytest.raises(TypeError, match="must contain 'key: value' settings - got a list"):
+        Config(manual_home_dir=home_dir)

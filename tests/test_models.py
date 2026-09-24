@@ -79,3 +79,11 @@ def test_career_gap_is_flagged_and_has_no_company(accessor):
     assert career_gap.is_career_gap is True
     assert career_gap.company is None
     assert job.is_career_gap is False
+
+
+def test_skill_usage_count_spans_every_section(accessor):
+    python = accessor.get_by_pk("Skill", name="Python")
+    terraform = accessor.get_by_pk("Skill", name="Terraform")
+
+    assert python.usage_count == 7
+    assert terraform.usage_count == 1

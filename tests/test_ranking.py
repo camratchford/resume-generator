@@ -6,8 +6,13 @@ from jinja2 import Environment
 from resume_generator.ranking import CategoryRanker, PositionRanker, load_profile
 
 
-def make_skill(name, *category_names):
-    return SimpleNamespace(name=name, categories=[SimpleNamespace(name=category) for category in category_names])
+def make_skill(name, *category_names, usage_count=0, is_keyword=False):
+    return SimpleNamespace(
+        name=name,
+        categories=[SimpleNamespace(name=category) for category in category_names],
+        usage_count=usage_count,
+        is_keyword=is_keyword,
+    )
 
 
 def make_detail(name, position, *skills):
@@ -43,8 +48,32 @@ def test_position_ranker_applies_details_limit():
     assert names(PositionRanker(details_limit=2).rank_details(details)) == ["0", "1"]
 
 
-def test_position_ranker_keeps_skill_order():
+def test_position_ranker_keeps_skill_order_when_usage_is_equal():
     assert names(PositionRanker().rank_skills([VIM, PYTHON, DNS])) == ["Vim", "Python", "DNS"]
+
+
+def test_position_ranker_orders_skills_by_usage():
+    rare = make_skill("Gitea", "Version Control", usage_count=1)
+    common = make_skill("Terraform", "IaC", usage_count=6)
+
+    assert names(PositionRanker().rank_skills([rare, common])) == ["Terraform", "Gitea"]
+
+
+def test_category_ranker_breaks_skill_ties_by_usage():
+    rare = make_skill("Gitea", "CI/CD", usage_count=1)
+    common = make_skill("Terraform", "CI/CD", usage_count=6)
+
+    assert names(CategoryRanker(["CI/CD"]).rank_skills([rare, common])) == ["Terraform", "Gitea"]
+
+
+def test_category_rank_outweighs_usage_for_skills():
+    heavily_used = make_skill("Python", "Programming", usage_count=20)
+    rarely_used = make_skill("DNS", "Networking", usage_count=1)
+
+    assert names(CategoryRanker(["Networking", "Programming"]).rank_skills([heavily_used, rarely_used])) == [
+        "DNS",
+        "Python",
+    ]
 
 
 def test_category_ranker_puts_best_category_first():
@@ -83,12 +112,33 @@ def test_category_ranker_applies_details_limit():
     assert names(CategoryRanker(["IoT", "Networking"], details_limit=2).rank_details(details)) == ["iot", "network"]
 
 
-def test_category_ranker_orders_skills_by_best_category_and_keeps_ties_stable():
+def test_category_ranker_takes_skills_from_each_category_in_turn():
     skills = [VIM, PYTHON, DNS, ZIGBEE, TERRAFORM]
 
     ranked = CategoryRanker(["Networking", "DevOps"]).rank_skills(skills)
 
-    assert names(ranked) == ["DNS", "ZigBee", "Python", "Terraform", "Vim"]
+    assert names(ranked) == ["DNS", "Python", "ZigBee", "Terraform", "Vim"]
+
+
+def test_round_robin_covers_later_categories_within_a_limit():
+    ci_skills = [make_skill(f"CI tool {index}", "CI/CD", usage_count=10 - index) for index in range(5)]
+    terraform = make_skill("Terraform", "IaC", usage_count=6)
+    docker = make_skill("Docker", "Containerization", usage_count=4)
+
+    ranked = CategoryRanker(["CI/CD", "IaC", "Containerization"], skills_limit=4).rank_skills(
+        [*ci_skills, terraform, docker]
+    )
+
+    assert names(ranked) == ["CI tool 0", "Terraform", "Docker", "CI tool 1"]
+
+
+def test_skill_in_several_categories_is_picked_once():
+    shared = make_skill("Kubernetes", "Containerization", "Cloud Platforms", usage_count=5)
+    cloud_only = make_skill("AWS", "Cloud Platforms", usage_count=3)
+
+    ranked = CategoryRanker(["Containerization", "Cloud Platforms"]).rank_skills([cloud_only, shared])
+
+    assert names(ranked) == ["Kubernetes", "AWS"]
 
 
 def test_load_profile_reads_categories_and_limit(tmp_path):
@@ -140,3 +190,38 @@ def test_limit_filters_work_from_a_template():
     )
 
     assert template.render(skills=[VIM, DNS, ZIGBEE]) == "DNS/DNS,ZigBee"
+
+
+INFRASTRUCTURE_AS_CODE = make_skill("Infrastructure as Code", "IaC", usage_count=9, is_keyword=True)
+
+
+@pytest.mark.parametrize("ranker", [PositionRanker(), CategoryRanker(["IaC"])], ids=["position", "category"])
+def test_rank_skills_can_select_only_tools(ranker):
+    assert names(ranker.rank_skills([INFRASTRUCTURE_AS_CODE, TERRAFORM], kind="tool")) == ["Terraform"]
+
+
+@pytest.mark.parametrize("ranker", [PositionRanker(), CategoryRanker(["IaC"])], ids=["position", "category"])
+def test_rank_skills_can_select_only_keywords(ranker):
+    assert names(ranker.rank_skills([TERRAFORM, INFRASTRUCTURE_AS_CODE], kind="keyword")) == ["Infrastructure as Code"]
+
+
+def test_rank_skills_includes_both_kinds_by_default():
+    ranked = CategoryRanker(["IaC"]).rank_skills([TERRAFORM, INFRASTRUCTURE_AS_CODE])
+
+    assert names(ranked) == ["Infrastructure as Code", "Terraform"]
+
+
+def test_rank_skills_rejects_unknown_kind():
+    with pytest.raises(ValueError, match="Unknown skill kind 'tools'"):
+        PositionRanker().rank_skills([TERRAFORM], kind="tools")
+
+
+def test_kind_and_limit_work_together_from_a_template():
+    environment = Environment()
+    environment.filters.update(rank_skills=CategoryRanker(["IaC", "Programming"]).rank_skills)
+
+    template = environment.from_string(
+        "{{ skills | rank_skills(kind='tool', limit=1) | map(attribute='name') | join(',') }}"
+    )
+
+    assert template.render(skills=[INFRASTRUCTURE_AS_CODE, PYTHON, TERRAFORM]) == "Terraform"

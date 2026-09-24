@@ -27,6 +27,7 @@ class SkillCategory(Model, table=True):
 
 class Skill(Model, table=True):
     name: str = Field(default=None, primary_key=True)
+    is_keyword: bool = Field(default=False)
     experience_details: list[ExperienceDetail] = Relationship(
         back_populates="skills", link_model=ExperienceDetailSkills
     )
@@ -34,6 +35,10 @@ class Skill(Model, table=True):
     projects: list[Project] = Relationship(back_populates="skills", link_model=ProjectSkills)
     hobbies: list[Hobby] = Relationship(back_populates="skills", link_model=HobbySkills)
     categories: list[SkillCategory] = Relationship(back_populates="skills", link_model=SkillCategorySkills)
+
+    @property
+    def usage_count(self) -> int:
+        return len(self.experience_details) + len(self.educations) + len(self.projects) + len(self.hobbies)
 
     @property
     def experiences(self):

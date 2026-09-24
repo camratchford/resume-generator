@@ -3,11 +3,22 @@ from typing import Any, Protocol, Sequence
 
 from yaml import safe_load
 
+SKILL_KINDS = ("tool", "keyword")
+
 
 class Ranker(Protocol):
     def rank_details(self, details: Sequence[Any], limit: int | None = None) -> list[Any]: ...
 
-    def rank_skills(self, skills: Sequence[Any], limit: int | None = None) -> list[Any]: ...
+    def rank_skills(self, skills: Sequence[Any], limit: int | None = None, kind: str | None = None) -> list[Any]: ...
+
+
+def filter_kind(skills: Sequence[Any], kind: str | None) -> list[Any]:
+    if kind is None:
+        return list(skills)
+    if kind not in SKILL_KINDS:
+        raise ValueError(f"Unknown skill kind {kind!r}, expected one of: {', '.join(SKILL_KINDS)}")
+    want_keywords = kind == "keyword"
+    return [skill for skill in skills if getattr(skill, "is_keyword", False) == want_keywords]
 
 
 def truncate(items: list[Any], limit: int | None, default_limit: int | None) -> list[Any]:
@@ -18,6 +29,22 @@ def position_key(detail: Any) -> tuple[bool, int]:
     return detail.position is None, detail.position or 0
 
 
+def usage_key(skill: Any) -> int:
+    return -getattr(skill, "usage_count", 0)
+
+
+def round_robin(queues: list[list[Any]]) -> list[Any]:
+    picked = {}
+    while any(queues):
+        for queue in queues:
+            while queue and queue[0].name in picked:
+                queue.pop(0)
+            if queue:
+                skill = queue.pop(0)
+                picked[skill.name] = skill
+    return list(picked.values())
+
+
 class PositionRanker:
     def __init__(self, details_limit: int | None = None, skills_limit: int | None = None):
         self.details_limit = details_limit
@@ -26,8 +53,8 @@ class PositionRanker:
     def rank_details(self, details: Sequence[Any], limit: int | None = None) -> list[Any]:
         return truncate(sorted(details, key=position_key), limit, self.details_limit)
 
-    def rank_skills(self, skills: Sequence[Any], limit: int | None = None) -> list[Any]:
-        return truncate(list(skills), limit, self.skills_limit)
+    def rank_skills(self, skills: Sequence[Any], limit: int | None = None, kind: str | None = None) -> list[Any]:
+        return truncate(sorted(filter_kind(skills, kind), key=usage_key), limit, self.skills_limit)
 
 
 class CategoryRanker:
@@ -54,8 +81,15 @@ class CategoryRanker:
     def rank_details(self, details: Sequence[Any], limit: int | None = None) -> list[Any]:
         return truncate(sorted(details, key=self.detail_sort_key), limit, self.details_limit)
 
-    def rank_skills(self, skills: Sequence[Any], limit: int | None = None) -> list[Any]:
-        ranked = sorted(skills, key=lambda skill: self.best_rank(self.matching_ranks(skill)))
+    def rank_skills(self, skills: Sequence[Any], limit: int | None = None, kind: str | None = None) -> list[Any]:
+        skills_by_usage = sorted(filter_kind(skills, kind), key=usage_key)
+        queues = [
+            [skill for skill in skills_by_usage if name in {category.name for category in skill.categories}]
+            for name in self.category_names
+        ]
+        ranked = round_robin(queues)
+        ranked_names = {skill.name for skill in ranked}
+        ranked += [skill for skill in skills_by_usage if skill.name not in ranked_names]
         return truncate(ranked, limit, self.skills_limit)
 
 

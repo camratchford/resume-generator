@@ -284,3 +284,14 @@ def test_explicit_positions_override_yaml_order(tmp_path):
     with Session(engine) as session:
         experience = session.get(Experience, {"canonical_name": "job"})
         assert [detail.canonical_name for detail in experience.details] == ["job-second", "job-first"]
+
+
+def test_skills_are_tools_unless_flagged_as_keywords(tmp_path):
+    engine = _make_engine(tmp_path)
+
+    with DataImporter(base_model=Model, engine=engine) as importer:
+        importer.load_data("- name: Terraform\n- name: Infrastructure as Code\n  is_keyword: true\n", Skill)
+
+    with Session(engine) as session:
+        assert session.get(Skill, {"name": "Terraform"}).is_keyword is False
+        assert session.get(Skill, {"name": "Infrastructure as Code"}).is_keyword is True

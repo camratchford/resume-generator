@@ -74,6 +74,13 @@ Templates are Jinja2 Markdown. Every table is available by its model name (`Cand
 
 Both ranking filters take an optional `limit` that overrides the configured cap, for example `Skill | rank_skills(limit=20)` for a top skills list.
 
+Skills are concrete tools by default. Mark umbrella terms that recruiters search for verbatim, such as `Linux` or `Infrastructure as Code`, with `is_keyword: true` in `skill.yml`. `rank_skills` then takes an optional `kind` of `"tool"` or `"keyword"`, so a template can list them separately:
+
+```jinja
+%( {{ Skill | rank_skills(kind="tool", limit=10) | join('||') }} )%
+%( {{ Skill | rank_skills(kind="keyword", limit=8) | join('||') }} )%
+```
+
 The Markdown supports a few extra inline syntaxes:
 
 | Syntax           | Renders as                      |
@@ -88,7 +95,7 @@ A template variable with no value, such as `{{ target_company }}`, is prompted f
 
 ## Ranking and profiles
 
-By default, details and skills keep the order they have in the data files. To tailor a resume, rank them by an ordered list of skill categories: details whose skills fall in the earliest categories come first, and ties go to the detail with more matching skills, then to data file order.
+By default, details keep the order they have in the data files, and skills are ordered by how often they're used across your data. To tailor a resume, rank them by an ordered list of skill categories: details whose skills fall in the earliest categories come first, and ties go to the detail with more matching skills, then to data file order. Skills are picked from each category in turn, most-used first, so a capped list covers every category you ranked.
 
 Pass the categories directly:
 

@@ -4,6 +4,7 @@ from typer.testing import CliRunner
 
 from resume_generator import __main__ as main_module
 from resume_generator.__main__ import cli
+from resume_generator.page_breaks import PageBreakMode
 from resume_generator.ranking import CategoryRanker, PositionRanker
 
 runner = CliRunner()
@@ -241,3 +242,45 @@ def test_empty_config_path_does_not_crash(home_dir, tmp_path, captured_render):
     result = invoke(home_dir, tmp_path, "-t", "resume.md", "-s", "resume.css", "-c", str(empty_config))
 
     assert result.exit_code == 0, result.output
+
+
+def test_page_breaks_default_to_h3(home_dir, tmp_path, captured_render):
+    result = invoke(home_dir, tmp_path, "-t", "resume.md", "-s", "resume.css")
+
+    assert result.exit_code == 0, result.output
+    assert captured_render[0]["page_breaks"] is PageBreakMode.H3
+
+
+def test_page_breaks_option_is_case_insensitive(home_dir, tmp_path, captured_render):
+    result = invoke(home_dir, tmp_path, "-t", "resume.md", "-s", "resume.css", "--page-breaks", "ANYWHERE")
+
+    assert result.exit_code == 0, result.output
+    assert captured_render[0]["page_breaks"] is PageBreakMode.ANYWHERE
+
+
+def test_page_breaks_option_rejects_unknown_modes(home_dir, tmp_path, captured_render):
+    result = invoke(home_dir, tmp_path, "-t", "resume.md", "-s", "resume.css", "--page-breaks", "h1")
+
+    assert result.exit_code != 0
+    assert captured_render == []
+
+
+def test_page_break_precedence_is_option_then_profile_then_config(home_dir, tmp_path, captured_render):
+    (home_dir / "config.yml").write_text("page_breaks: h4\n")
+    (home_dir / "profiles" / "devops.yml").write_text("categories:\n- DevOps\npage_breaks: h2\n")
+
+    invoke(home_dir, tmp_path, "-t", "resume.md", "-s", "resume.css")
+    invoke(home_dir, tmp_path, "-t", "resume.md", "-s", "resume.css", "--profile", "devops")
+    invoke(home_dir, tmp_path, "-t", "resume.md", "-s", "resume.css", "--profile", "devops", "--page-breaks", "off")
+
+    assert [call["page_breaks"] for call in captured_render] == [PageBreakMode.H4, PageBreakMode.H2, PageBreakMode.OFF]
+
+
+def test_invalid_page_breaks_in_config_is_rejected(home_dir, tmp_path, captured_render):
+    (home_dir / "config.yml").write_text("page_breaks: sometimes\n")
+
+    result = invoke(home_dir, tmp_path, "-t", "resume.md", "-s", "resume.css")
+
+    assert result.exit_code != 0
+    assert "Unknown page_breaks mode 'sometimes'" in str(result.exception)
+    assert captured_render == []

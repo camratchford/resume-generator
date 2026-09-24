@@ -6,6 +6,7 @@ from typer import Argument, Option, TyperException
 
 from resume_generator.config import Config
 from resume_generator.data import DBAccessor
+from resume_generator.page_breaks import PageBreakMode
 from resume_generator.ranking import CategoryRanker, PositionRanker, Ranker, load_profile
 from resume_generator.resume import Model
 
@@ -157,6 +158,16 @@ ProfileNameOption = Annotated[
         rich_help_panel=RANKING_PANEL,
     ),
 ]
+PageBreaksOption = Annotated[
+    PageBreakMode | None,
+    Option(
+        "--page-breaks",
+        case_sensitive=False,
+        help="Where pages may break: 'off' (only explicit breaks), 'anywhere' (never strand a heading or split a "
+        "bullet), or 'h2'/'h3'/'h4' (also keep each section at that heading level together). Defaults to h3",
+        rich_help_panel=OUTPUT_PANEL,
+    ),
+]
 CategoriesOption = Annotated[
     str,
     Option(
@@ -247,14 +258,25 @@ def parse_limit(name: str, value: Any) -> int | None:
         raise TyperException(f"'{name}' must be a whole number - got {value!r}") from error
 
 
-def build_ranker(config: Config, profile_name: str | None, categories: str) -> Ranker:
-    profile = {}
-    if profile_name:
-        try:
-            profile = load_profile(config.profiles_dir, profile_name)
-        except (FileNotFoundError, TypeError) as error:
-            raise TyperException(str(error)) from error
+def load_selected_profile(config: Config, profile_name: str | None) -> dict[str, Any]:
+    if not profile_name:
+        return {}
+    try:
+        return load_profile(config.profiles_dir, profile_name)
+    except (FileNotFoundError, TypeError) as error:
+        raise TyperException(str(error)) from error
 
+
+def resolve_page_break_mode(config: Config, profile: dict[str, Any], mode: PageBreakMode | None) -> PageBreakMode:
+    value = mode or profile.get("page_breaks") or config.page_breaks
+    try:
+        return PageBreakMode(str(getattr(value, "value", value)).lower())
+    except ValueError as error:
+        modes = ", ".join(page_break_mode.value for page_break_mode in PageBreakMode)
+        raise TyperException(f"Unknown page_breaks mode {value!r}. Expected one of: {modes}") from error
+
+
+def build_ranker(config: Config, profile: dict[str, Any], categories: str) -> Ranker:
     category_names = profile.get("categories", [])
     details_limit = parse_limit("bullets_per_job", profile.get("bullets_per_job", config.bullets_per_job))
     skills_limit = parse_limit("skills_per_job", profile.get("skills_per_job", config.skills_per_job))

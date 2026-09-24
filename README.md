@@ -121,6 +121,18 @@ resume-generator render out/ -t resume.md -s resume.css --profile field
 
 `--categories` overrides a profile's category list. Unknown category or profile names are reported with the valid options.
 
+## Page breaks
+
+By default, each `###` section (a job, project, or education entry) is kept together on one page. Set the mode with `--page-breaks`, `page_breaks` in a profile, or `page_breaks` in `config.yml`, in that order of precedence:
+
+| Mode | Behavior |
+| --- | --- |
+| `off` | Pages break wherever the content runs out, plus explicit `%:pg:%` breaks |
+| `anywhere` | Headings are never left at the bottom of a page, and bullets, skill rows, and columns are never split |
+| `h2`, `h3`, `h4` | As `anywhere`, and each section at that heading level (and each deeper section inside it) is kept together |
+
+`h3` is the default. A section taller than a page can't be kept together, so it breaks where it stands rather than leaving a gap, while the sections inside it still stay whole.
+
 ## Configuration
 
 `bullets_per_job` and `skills_per_job` can also be set globally in `config.yml` or for one run with `-o key=value`. A profile's values take precedence:

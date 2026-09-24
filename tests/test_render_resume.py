@@ -5,6 +5,7 @@ from resume_generator import render_resume as render_resume_module
 from resume_generator.config import Config
 from resume_generator.db import initialize_db
 from resume_generator.import_data import import_yaml_data
+from resume_generator.page_breaks import PageBreakMode, page_break_css
 from resume_generator.ranking import CategoryRanker
 from resume_generator.render_resume import render_resume
 from resume_generator.resume import Model
@@ -61,7 +62,9 @@ def test_output_directory_is_created(config, engine, tmp_path, captured_pdf_call
 def test_stylesheet_is_read_from_css_dir(config, engine, tmp_path, captured_pdf_calls):
     render(config, engine, tmp_path)
 
-    assert captured_pdf_calls[0]["css"] == (config.css_dir / "resume.css").read_text()
+    css = captured_pdf_calls[0]["css"]
+    assert css.endswith((config.css_dir / "resume.css").read_text())
+    assert css.startswith(page_break_css(PageBreakMode.H3))
 
 
 def test_metadata_includes_candidate_and_keywords(config, engine, tmp_path, captured_pdf_calls):
@@ -177,3 +180,28 @@ def test_category_ranking_reorders_skill_bubbles(config, engine, tmp_path, captu
 
     markdown = (tmp_path / "Test Candidate - Resume.md").read_text()
     assert "%( Terraform||Python )%" in markdown
+
+
+def test_default_page_breaks_wrap_h3_sections(config, engine, tmp_path, captured_pdf_calls):
+    render(config, engine, tmp_path)
+
+    call = captured_pdf_calls[0]
+    assert 'class="page-break-section level-3"' in call["html"]
+    assert call["relax_oversized_sections"] is True
+
+
+def test_page_breaks_off_leaves_html_and_css_untouched(config, engine, tmp_path, captured_pdf_calls):
+    render(config, engine, tmp_path, page_breaks="off")
+
+    call = captured_pdf_calls[0]
+    assert "page-break-section" not in call["html"]
+    assert call["css"] == (config.css_dir / "resume.css").read_text()
+    assert call["relax_oversized_sections"] is False
+
+
+def test_anywhere_mode_adds_keep_together_rules_without_sections(config, engine, tmp_path, captured_pdf_calls):
+    render(config, engine, tmp_path, page_breaks=PageBreakMode.ANYWHERE)
+
+    call = captured_pdf_calls[0]
+    assert "page-break-section" not in call["html"]
+    assert "break-after: avoid" in call["css"]

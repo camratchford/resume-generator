@@ -6,6 +6,7 @@ from sqlalchemy import Engine
 from resume_generator.config import Config
 from resume_generator.data import DBAccessor
 from resume_generator.md import create_markdown_renderer
+from resume_generator.page_breaks import PageBreakMode, SectionWrapExtension, page_break_css
 from resume_generator.pdf import PDFMetadata, PDFOptions, render_pdf
 from resume_generator.ranking import Ranker
 from resume_generator.resume import Model
@@ -29,7 +30,9 @@ def render_resume(
     generate_html: bool,
     generate_markdown: bool,
     ranker: Ranker = None,
+    page_breaks: PageBreakMode | str | None = None,
 ):
+    page_break_mode = PageBreakMode(page_breaks or config.page_breaks)
     with DBAccessor(base_model=Model, engine=engine) as db_accessor:
         candidates = db_accessor["Candidate"]
         if not candidates:
@@ -58,13 +61,16 @@ def render_resume(
         if generate_markdown and not config.dry_run:
             out_file.with_suffix(".md").write_text(markdown)
 
-        html_renderer = create_markdown_renderer()
+        section_extensions = []
+        if page_break_mode.heading_level is not None:
+            section_extensions.append(SectionWrapExtension(page_break_mode.heading_level))
+        html_renderer = create_markdown_renderer(extra_extensions=section_extensions)
         html = html_renderer.convert(markdown)
         if generate_html and not config.dry_run:
             out_file.with_suffix(".html").write_text(html)
 
         css_path = config.css_dir.joinpath(css_stylesheet_name)
-        css = css_path.read_text()
+        css = page_break_css(page_break_mode) + css_path.read_text()
 
         now = datetime.now()
         metadata_kwargs = {
@@ -84,4 +90,11 @@ def render_resume(
         pdf_options = PDFOptions(custom_metadata=True)
         if config.dry_run:
             out_file = None
-        render_pdf(out_file=out_file, html=html, css=css, pdf_metadata=pdf_metadata, pdf_options=pdf_options)
+        render_pdf(
+            out_file=out_file,
+            html=html,
+            css=css,
+            pdf_metadata=pdf_metadata,
+            pdf_options=pdf_options,
+            relax_oversized_sections=page_break_mode.heading_level is not None,
+        )

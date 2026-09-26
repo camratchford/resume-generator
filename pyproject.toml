@@ -23,7 +23,7 @@ classifiers = [
 ]
 
 dependencies = [
-    "byoconfig",
+    "byoconfig>=3,<4",
     "typer",
     "jinja2",
     "click",

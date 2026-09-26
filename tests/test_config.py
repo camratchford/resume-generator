@@ -101,7 +101,7 @@ def test_explicit_config_file_takes_precedence_over_home_config(home_dir, tmp_pa
 
     config = Config(manual_home_dir=home_dir, config_file=explicit_config)
 
-    assert config.get_by_prefix("metadata", trim_prefix=True)['title'] == "From Explicit"
+    assert config.get_by_prefix("metadata", trim_prefix=True)["title"] == "From Explicit"
 
 
 def test_kwargs_override_defaults(home_dir):

@@ -1,9 +1,8 @@
 from datetime import datetime
 from pathlib import Path
-from typing import Any, Mapping
+from typing import Any
 
 from byoconfig import BYOConfig
-from yaml import safe_load
 
 
 class Config(BYOConfig):
@@ -99,20 +98,6 @@ class Config(BYOConfig):
     def get_missing_home_dir_subpaths(home_dir: Path):
         required_subpaths = ("templates", "data", "css")
         return [home_dir.joinpath(subpath) for subpath in required_subpaths if not home_dir.joinpath(subpath).exists()]
-
-    @staticmethod
-    def usable_config_file(config_file: Path | None) -> Path | None:
-        if config_file is None:
-            return None
-
-        settings = safe_load(Path(config_file).read_text())
-        if settings is None:
-            return None
-        if not isinstance(settings, Mapping):
-            raise TypeError(
-                f"Config file {config_file} must contain 'key: value' settings - got a {type(settings).__name__}"
-            )
-        return config_file
 
     def __init__(self, **kwargs):
         self.manual_home_dir = kwargs.get("manual_home_dir")

@@ -17,6 +17,8 @@ class Config(BYOConfig):
     bullets_per_job: int | None = None
     skills_per_job: int | None = None
     page_breaks: str = "h3"
+    template_name: str = "default.md"
+    css_stylesheet_name: str = "default.css"
 
     manual_home_dir: Path | None = None
     manual_templates_dir: Path | None = None

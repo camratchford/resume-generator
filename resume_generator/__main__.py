@@ -28,6 +28,7 @@ from resume_generator.cli import (
     raise_on_mutually_exclusive_params,
     raise_on_unknown_categories,
     resolve_page_break_mode,
+    resolve_setting,
     split_file_path,
 )
 from resume_generator.config import Config
@@ -81,6 +82,8 @@ def render(
     ranker = build_ranker(config, profile, categories)
     raise_on_unknown_categories(ranker, db_engine)
     page_break_mode = resolve_page_break_mode(config, profile, page_breaks)
+    template_name = resolve_setting(template_name, profile, config, "template_name")
+    css_stylesheet_name = resolve_setting(css_stylesheet_name, profile, config, "css_stylesheet_name")
 
     render_resume(
         template_name=template_name,

@@ -284,3 +284,83 @@ def test_invalid_page_breaks_in_config_is_rejected(home_dir, tmp_path, captured_
     assert result.exit_code != 0
     assert "Unknown page_breaks mode 'sometimes'" in str(result.exception)
     assert captured_render == []
+
+
+@pytest.fixture
+def default_files(home_dir):
+    (home_dir / "templates" / "default.md").write_text("default template")
+    (home_dir / "css" / "default.css").write_text("body {}")
+    return home_dir
+
+
+def rendered_names(captured_render):
+    return [(call["template_name"], call["css_stylesheet_name"]) for call in captured_render]
+
+
+def test_template_and_stylesheet_fall_back_to_default_names(default_files, tmp_path, captured_render):
+    result = invoke(default_files, tmp_path)
+
+    assert result.exit_code == 0, result.output
+    assert rendered_names(captured_render) == [("default.md", "default.css")]
+
+
+def test_config_file_sets_template_and_stylesheet(default_files, tmp_path, captured_render):
+    (default_files / "config.yml").write_text("template_name: resume.md\ncss_stylesheet_name: resume.css\n")
+
+    result = invoke(default_files, tmp_path)
+
+    assert result.exit_code == 0, result.output
+    assert rendered_names(captured_render) == [("resume.md", "resume.css")]
+
+
+def test_environment_overrides_config_file(default_files, tmp_path, captured_render, monkeypatch):
+    (default_files / "config.yml").write_text("template_name: from-config.md\n")
+    monkeypatch.setenv("RESUME_GENERATOR_TEMPLATE_NAME", "resume.md")
+
+    result = invoke(default_files, tmp_path)
+
+    assert result.exit_code == 0, result.output
+    assert captured_render[0]["template_name"] == "resume.md"
+
+
+def test_profile_overrides_environment(default_files, tmp_path, captured_render, monkeypatch):
+    monkeypatch.setenv("RESUME_GENERATOR_TEMPLATE_NAME", "from-env.md")
+    (default_files / "profiles" / "devops.yml").write_text(
+        "categories:\n- DevOps\ntemplate_name: resume.md\ncss_stylesheet_name: resume.css\n"
+    )
+
+    result = invoke(default_files, tmp_path, "--profile", "devops")
+
+    assert result.exit_code == 0, result.output
+    assert rendered_names(captured_render) == [("resume.md", "resume.css")]
+
+
+def test_options_override_profile(default_files, tmp_path, captured_render):
+    (default_files / "profiles" / "devops.yml").write_text("categories:\n- DevOps\ntemplate_name: from-profile.md\n")
+
+    result = invoke(default_files, tmp_path, "--profile", "devops", "-t", "resume.md", "-s", "resume.css")
+
+    assert result.exit_code == 0, result.output
+    assert rendered_names(captured_render) == [("resume.md", "resume.css")]
+
+
+def test_template_path_overrides_every_default(default_files, tmp_path, captured_render):
+    (default_files / "config.yml").write_text("template_name: from-config.md\n")
+    template = tmp_path / "elsewhere" / "tailored.md"
+    template.parent.mkdir()
+    template.write_text("tailored")
+
+    result = invoke(default_files, tmp_path, "--template-path", str(template))
+
+    assert result.exit_code == 0, result.output
+    assert captured_render[0]["template_name"] == "tailored.md"
+    assert captured_render[0]["config"].templates_dir == template.parent
+
+
+def test_profile_overrides_extra_option(default_files, tmp_path, captured_render):
+    (default_files / "profiles" / "devops.yml").write_text("categories:\n- DevOps\ntemplate_name: resume.md\n")
+
+    result = invoke(default_files, tmp_path, "--profile", "devops", "-o", "template_name=from-option.md")
+
+    assert result.exit_code == 0, result.output
+    assert captured_render[0]["template_name"] == "resume.md"

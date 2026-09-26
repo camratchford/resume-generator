@@ -68,7 +68,8 @@ TemplateNameOption = Annotated[
     Option(
         "-t",
         "--template-name",
-        help="File name of the template to render. Must be in the templates directory",
+        help="File name of the template to render, in the templates directory. Defaults to the profile's or "
+        "config's template_name, then 'default.md'",
         rich_help_panel=TEMPLATES_PANEL,
     ),
 ]
@@ -88,7 +89,8 @@ CSSStylesheetNameOption = Annotated[
     Option(
         "-s",
         "--css-stylesheet-name",
-        help="File name of the CSS stylesheet to use. Must be in the CSS directory",
+        help="File name of the CSS stylesheet to use, in the CSS directory. Defaults to the profile's or "
+        "config's css_stylesheet_name, then 'default.css'",
         rich_help_panel=TEMPLATES_PANEL,
     ),
 ]
@@ -267,8 +269,12 @@ def load_selected_profile(config: Config, profile_name: str | None) -> dict[str,
         raise TyperException(str(error)) from error
 
 
+def resolve_setting(option_value: Any, profile: dict[str, Any], config: Config, key: str) -> Any:
+    return option_value or profile.get(key) or config.get(key)
+
+
 def resolve_page_break_mode(config: Config, profile: dict[str, Any], mode: PageBreakMode | None) -> PageBreakMode:
-    value = mode or profile.get("page_breaks") or config.page_breaks
+    value = resolve_setting(mode, profile, config, "page_breaks")
     try:
         return PageBreakMode(str(getattr(value, "value", value)).lower())
     except ValueError as error:

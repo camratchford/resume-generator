@@ -14,8 +14,10 @@ python -m venv .venv
 ## Usage
 
 ```shell
-resume-generator render OUTPUT_PATH --home-dir ~/resume-generator -t resume.md -s resume.css
+resume-generator render OUTPUT_PATH --home-dir ~/resume-generator
 ```
+
+The template and stylesheet default to `default.md` and `default.css` in the home directory. Choose others with `-t NAME` and `-s NAME`, or set `template_name` and `css_stylesheet_name` in a profile, an environment variable, or `config.yml` (see [Configuration](#configuration)).
 
 - `OUTPUT_PATH` ending in `.pdf` is used as the file path. Any other path is treated as a directory, and the file is named `{candidate.name} - Resume.pdf` (or `-n NAME` if given).
 - `--markdown` and `--html` also write the intermediate files next to the PDF.
@@ -100,7 +102,7 @@ By default, details keep the order they have in the data files, and skills are o
 Pass the categories directly:
 
 ```shell
-resume-generator render out/ -t resume.md -s resume.css --categories "Networking,IoT,Linux Services"
+resume-generator render out/ --categories "Networking,IoT,Linux Services"
 ```
 
 Or save them as a profile in `profiles/`, and select it by name:
@@ -116,7 +118,7 @@ skills_per_job: 8
 ```
 
 ```shell
-resume-generator render out/ -t resume.md -s resume.css --profile field
+resume-generator render out/ --profile field
 ```
 
 `--categories` overrides a profile's category list. Unknown category or profile names are reported with the valid options.
@@ -135,10 +137,21 @@ By default, each `###` section (a job, project, or education entry) is kept toge
 
 ## Configuration
 
-`bullets_per_job` and `skills_per_job` can also be set globally in `config.yml` or for one run with `-o key=value`. A profile's values take precedence:
+Settings are resolved in this order, first match wins:
+
+1. A dedicated command-line option, such as `-t`, `-s`, or `--page-breaks`
+2. The selected profile
+3. `-o key=value`, which sets any config value for one run
+4. An environment variable named `RESUME_GENERATOR_` plus the setting name in capitals, such as `RESUME_GENERATOR_TEMPLATE_NAME`
+5. `config.yml`
+6. The built-in default
+
+Settings that profiles can override: `template_name`, `css_stylesheet_name`, `bullets_per_job`, `skills_per_job`, and `page_breaks`.
 
 ```yaml
 # config.yml
+template_name: resume.md
+css_stylesheet_name: resume.css
 bullets_per_job: 5
 metadata_title: Your Name - Resume
 ```

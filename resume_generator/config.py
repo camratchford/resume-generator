@@ -116,8 +116,9 @@ class Config(BYOConfig):
             if found_config_files:
                 home_config_file = found_config_files.pop()
 
-        self.update(kwargs)
         self.load_from_file(kwargs.get("config_file", home_config_file), not_exists_ok=True)
         self.load_from_environment(prefix=self.env_prefix)
+        self.update(kwargs)
+
         self.pdf_keywords = list(self.pdf_keywords)
         self.parse_pdf_keywords(pdf_keywords)

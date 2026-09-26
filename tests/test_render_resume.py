@@ -238,3 +238,9 @@ def test_pinned_detail_leads_its_job(config, engine, tmp_path, captured_pdf_call
 
     markdown = (tmp_path / "Test Candidate - Resume.md").read_text()
     assert markdown.index("- Automated test infrastructure.") < markdown.index("- Did testing things.")
+
+
+def test_relative_urls_resolve_against_the_stylesheet(config, engine, tmp_path, captured_pdf_calls):
+    render(config, engine, tmp_path / "out")
+
+    assert captured_pdf_calls[0]["base_url"] == config.css_dir / "resume.css"

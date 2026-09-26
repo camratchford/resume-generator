@@ -20,9 +20,10 @@ def render_document(
 ):
     options = pdf_options.model_dump(exclude_none=True)
     font_config = FontConfiguration()
+    base_href = Path(base_url).resolve().as_uri() if base_url is not None else None
 
     def layout(stylesheet: str):
-        document_html = render_document_html(html=html, css=stylesheet, metadata=pdf_metadata)
+        document_html = render_document_html(html=html, css=stylesheet, metadata=pdf_metadata, base_href=base_href)
         return HTML(string=document_html, base_url=base_url).render(font_config=font_config, **options), document_html
 
     document, document_html = layout(css)
@@ -44,6 +45,7 @@ def render_pdf(
     pdf_options: PDFOptions = None,
     relax_oversized_sections: bool = False,
     html_out_file: Path | None = None,
+    base_url: Path | None = None,
 ):
     """Render HTML/CSS to a PDF file using WeasyPrint.
 
@@ -61,10 +63,15 @@ def render_pdf(
             instead of first being pushed to a new page.
         html_out_file: If given, also write the complete HTML document that
             was laid out, including the stylesheet and metadata, to this path.
+        base_url: What relative URLs (such as fonts in the stylesheet) resolve
+            against. Pass the stylesheet's path to resolve them the way a
+            linked stylesheet would. Defaults to `out_file`.
     """
     pdf_metadata = pdf_metadata or PDFMetadata(title=out_file.stem)
     pdf_options = pdf_options or PDFOptions()
     pdf_options.custom_metadata = bool(pdf_metadata.custom)
 
-    document = render_document(html, css, pdf_metadata, pdf_options, out_file, relax_oversized_sections, html_out_file)
+    document = render_document(
+        html, css, pdf_metadata, pdf_options, base_url or out_file, relax_oversized_sections, html_out_file
+    )
     document.write_pdf(target=out_file, **pdf_options.model_dump(exclude_none=True))

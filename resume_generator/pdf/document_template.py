@@ -10,6 +10,9 @@ BASE_HTML_TEMPLATE = """
 <head>
 <title>{{ title }}</title>
 <meta http-equiv="Content-type" content="text/html;charset=UTF-8">
+{% if base_href %}
+<base href="{{ base_href }}">
+{% endif %}
 {% for author in authors %}
 <meta name="author" content="{{ author }}">
 {% endfor %}
@@ -38,8 +41,8 @@ def finalize(value: Any):
     return value if value is not None else ""
 
 
-def render_document_html(html: str, css: str, metadata: PDFMetadata):
+def render_document_html(html: str, css: str, metadata: PDFMetadata, base_href: str | None = None):
     jinja2_env = Environment(finalize=finalize)
-    template_globals = {"html": html, "css": css, **metadata.model_dump()}
+    template_globals = {"html": html, "css": css, "base_href": base_href, **metadata.model_dump()}
 
     return jinja2_env.from_string(BASE_HTML_TEMPLATE, globals=template_globals).render()

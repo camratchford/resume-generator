@@ -1,6 +1,7 @@
 from datetime import datetime
 
 import pytest
+from PIL import Image
 from pydantic import ValidationError
 
 from resume_generator.page_breaks import SECTION_CSS
@@ -117,3 +118,37 @@ def test_document_html_declares_the_metadata_language():
     document = render_document_html(html="", css="", metadata=PDFMetadata(title="My Resume", language="en-ca"))
 
     assert '<html lang="en-ca">' in document
+
+
+def test_document_html_includes_a_base_href_only_when_given():
+    with_base = render_document_html(html="", css="", metadata=PDFMetadata(), base_href="file:///home/css/resume.css")
+    without_base = render_document_html(html="", css="", metadata=PDFMetadata())
+
+    assert '<base href="file:///home/css/resume.css">' in with_base
+    assert "<base" not in without_base
+
+
+def loaded_images(document):
+    return [
+        box
+        for page in document.pages
+        for box in page._page_box.descendants()
+        if type(box).__name__.endswith("ReplacedBox")
+    ]
+
+
+def test_relative_urls_resolve_against_the_base_url(tmp_path):
+    (tmp_path / "css").mkdir()
+    (tmp_path / "images").mkdir()
+    Image.new("RGB", (4, 4), "red").save(tmp_path / "images" / "dot.png")
+    stylesheet = tmp_path / "css" / "resume.css"
+    stylesheet.write_text("")
+    html = '<img src="../images/dot.png" alt="missing">'
+
+    resolved = render_document(html, "", PDFMetadata(), PDFOptions(), base_url=stylesheet)
+    unresolved = render_document(
+        html, "", PDFMetadata(), PDFOptions(), base_url=tmp_path / "out" / "nested" / "resume.pdf"
+    )
+
+    assert len(loaded_images(resolved)) == 1
+    assert loaded_images(unresolved) == []

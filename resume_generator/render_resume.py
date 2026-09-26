@@ -99,4 +99,5 @@ def render_resume(
             pdf_options=pdf_options,
             relax_oversized_sections=page_break_mode.heading_level is not None,
             html_out_file=out_file.with_suffix(".html") if generate_html and not config.dry_run else None,
+            base_url=css_path,
         )

@@ -16,22 +16,24 @@ def render_document(
     pdf_options: PDFOptions,
     base_url: Path | None = None,
     relax_oversized_sections: bool = False,
+    html_out_file: Path | None = None,
 ):
     options = pdf_options.model_dump(exclude_none=True)
     font_config = FontConfiguration()
 
     def layout(stylesheet: str):
         document_html = render_document_html(html=html, css=stylesheet, metadata=pdf_metadata)
-        return HTML(string=document_html, base_url=base_url).render(font_config=font_config, **options)
+        return HTML(string=document_html, base_url=base_url).render(font_config=font_config, **options), document_html
 
-    document = layout(css)
-    if not relax_oversized_sections:
-        return document
+    document, document_html = layout(css)
+    if relax_oversized_sections:
+        relaxing_css = oversized_section_css(document)
+        if relaxing_css:
+            document, document_html = layout(css + relaxing_css)
 
-    relaxing_css = oversized_section_css(document)
-    if not relaxing_css:
-        return document
-    return layout(css + relaxing_css)
+    if html_out_file is not None:
+        html_out_file.write_text(document_html)
+    return document
 
 
 def render_pdf(
@@ -41,6 +43,7 @@ def render_pdf(
     pdf_metadata: PDFMetadata = None,
     pdf_options: PDFOptions = None,
     relax_oversized_sections: bool = False,
+    html_out_file: Path | None = None,
 ):
     """Render HTML/CSS to a PDF file using WeasyPrint.
 
@@ -56,10 +59,12 @@ def render_pdf(
         relax_oversized_sections: Re-render with `break-inside: auto` on any
             page-break section taller than a page, so it breaks in place
             instead of first being pushed to a new page.
+        html_out_file: If given, also write the complete HTML document that
+            was laid out, including the stylesheet and metadata, to this path.
     """
     pdf_metadata = pdf_metadata or PDFMetadata(title=out_file.stem)
     pdf_options = pdf_options or PDFOptions()
     pdf_options.custom_metadata = bool(pdf_metadata.custom)
 
-    document = render_document(html, css, pdf_metadata, pdf_options, out_file, relax_oversized_sections)
+    document = render_document(html, css, pdf_metadata, pdf_options, out_file, relax_oversized_sections, html_out_file)
     document.write_pdf(target=out_file, **pdf_options.model_dump(exclude_none=True))

@@ -90,10 +90,15 @@ def test_markdown_and_html_intermediaries(config, engine, tmp_path, captured_pdf
     render(config, engine, tmp_path, generate_markdown=True, generate_html=True)
 
     markdown = (tmp_path / "Test Candidate - Resume.md").read_text()
-    html = (tmp_path / "Test Candidate - Resume.html").read_text()
     assert "# TEST CANDIDATE" in markdown
-    assert "<h1>TEST CANDIDATE</h1>" in html
-    assert captured_pdf_calls[0]["html"] == html
+    assert "<h1>TEST CANDIDATE</h1>" in captured_pdf_calls[0]["html"]
+    assert captured_pdf_calls[0]["html_out_file"] == tmp_path / "Test Candidate - Resume.html"
+
+
+def test_html_output_is_not_requested_without_the_flag(config, engine, tmp_path, captured_pdf_calls):
+    render(config, engine, tmp_path)
+
+    assert captured_pdf_calls[0]["html_out_file"] is None
 
 
 def test_dry_run_writes_no_files(home_dir, tmp_path, captured_pdf_calls):

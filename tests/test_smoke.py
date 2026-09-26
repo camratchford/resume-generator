@@ -63,6 +63,10 @@ def test_cli_generates_markdown_and_html_intermediaries(home_dir, tmp_path, monk
     assert "at None" not in markdown_text
 
     html_text = next(out_dir.glob("*.html")).read_text()
+    assert html_text.lstrip().startswith("<!DOCTYPE html>")
+    assert (home_dir / "css" / "resume.css").read_text() in html_text
+    assert "break-inside: avoid" in html_text
+    assert "<title>Test Candidate - Resume</title>" in html_text
     assert '<div class="row">' in html_text
 
 

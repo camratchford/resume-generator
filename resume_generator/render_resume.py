@@ -69,8 +69,6 @@ def render_resume(
             section_extensions.append(SectionWrapExtension(page_break_mode.heading_level))
         html_renderer = create_markdown_renderer(extra_extensions=section_extensions)
         html = html_renderer.convert(markdown)
-        if generate_html and not config.dry_run:
-            out_file.with_suffix(".html").write_text(html)
 
         css_path = config.css_dir.joinpath(css_stylesheet_name)
         css = page_break_css(page_break_mode) + css_path.read_text()
@@ -100,4 +98,5 @@ def render_resume(
             pdf_metadata=pdf_metadata,
             pdf_options=pdf_options,
             relax_oversized_sections=page_break_mode.heading_level is not None,
+            html_out_file=out_file.with_suffix(".html") if generate_html and not config.dry_run else None,
         )

@@ -6,7 +6,7 @@ from resume_generator.pdf.metadata import PDFMetadata
 
 BASE_HTML_TEMPLATE = """
 <!DOCTYPE html>
-<html lang="{{ title }}">
+<html lang="{{ language }}">
 <head>
 <title>{{ title }}</title>
 <meta http-equiv="Content-type" content="text/html;charset=UTF-8">

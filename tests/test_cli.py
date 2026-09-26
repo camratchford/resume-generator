@@ -99,7 +99,7 @@ def test_extra_options_are_set_on_config(home_dir, tmp_path, captured_render):
     result = invoke(home_dir, tmp_path, "-t", "resume.md", "-s", "resume.css", "-o", "metadata_title=Custom Title")
 
     assert result.exit_code == 0, result.output
-    assert captured_render[0]["config"].get_by_prefix("metadata", trim_prefix=True) == {"title": "Custom Title"}
+    assert captured_render[0]["config"].get_by_prefix("metadata", trim_prefix=True)["title"] == "Custom Title"
 
 
 def test_extra_option_with_empty_value_is_rejected(home_dir, tmp_path, captured_render):
@@ -144,7 +144,7 @@ def test_config_path_is_loaded(home_dir, tmp_path, captured_render):
     result = invoke(home_dir, tmp_path, "-t", "resume.md", "-s", "resume.css", "-c", str(config_file))
 
     assert result.exit_code == 0, result.output
-    assert captured_render[0]["config"].get_by_prefix("metadata", trim_prefix=True) == {"title": "From Flag"}
+    assert captured_render[0]["config"].get_by_prefix("metadata", trim_prefix=True)["title"] == "From Flag"
 
 
 def test_default_ranker_keeps_data_order(home_dir, tmp_path, captured_render):

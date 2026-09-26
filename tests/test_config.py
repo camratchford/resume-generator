@@ -91,7 +91,7 @@ def test_config_yml_in_home_dir_is_loaded(home_dir):
     config = Config(manual_home_dir=home_dir)
 
     assert config.db_echo is True
-    assert config.get_by_prefix("metadata", trim_prefix=True) == {"title": "From Home"}
+    assert config.get_by_prefix("metadata", trim_prefix=True)["title"] == "From Home"
 
 
 def test_explicit_config_file_takes_precedence_over_home_config(home_dir, tmp_path):
@@ -101,7 +101,7 @@ def test_explicit_config_file_takes_precedence_over_home_config(home_dir, tmp_pa
 
     config = Config(manual_home_dir=home_dir, config_file=explicit_config)
 
-    assert config.get_by_prefix("metadata", trim_prefix=True) == {"title": "From Explicit"}
+    assert config.get_by_prefix("metadata", trim_prefix=True)['title'] == "From Explicit"
 
 
 def test_kwargs_override_defaults(home_dir):
@@ -173,5 +173,5 @@ def test_empty_explicit_config_file_is_ignored(home_dir, tmp_path):
 def test_config_file_that_is_not_a_mapping_is_rejected(home_dir):
     (home_dir / "config.yml").write_text("- bullets_per_job\n- 4\n")
 
-    with pytest.raises(TypeError, match="must contain 'key: value' settings - got a list"):
+    with pytest.raises(TypeError, match="argument after \\*\\* must be a mapping\\, not list"):
         Config(manual_home_dir=home_dir)

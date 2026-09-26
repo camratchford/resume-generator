@@ -1,7 +1,8 @@
+from datetime import datetime
 from pathlib import Path
 from typing import Any, Mapping
 
-from byoconfig import Config as BYOConfig
+from byoconfig import BYOConfig
 from yaml import safe_load
 
 
@@ -9,6 +10,7 @@ class Config(BYOConfig):
     base_module: str = __name__.split(".")[0]
     app_name: str = base_module.replace("_", "-")
     env_prefix: str = base_module.upper()
+    config_file: str | Path | None = None
 
     dry_run: bool = False
     variable_default_values: dict[str, Any] = {}
@@ -21,6 +23,16 @@ class Config(BYOConfig):
     manual_templates_dir: Path | None = None
     manual_data_dir: Path | None = None
     manual_css_dir: Path | None = None
+
+    metadata_title: str | None = None
+    metadata_description: str | None = None
+    metadata_generator: str | None = None
+    metadata_language: str | None = None
+    metadata_keywords: list[str] | None = None
+    metadata_authors: list[str] | None = None
+    metadata_created: datetime | None = None
+    metadata_modified: datetime | None = None
+    metadata_custom: dict | None = None
 
     @property
     def home_dir(self) -> Path:
@@ -119,7 +131,8 @@ class Config(BYOConfig):
             if found_config_files:
                 home_config_file = found_config_files.pop()
 
-        config_file = self.usable_config_file(kwargs.get("config_file", home_config_file))
-        super().__init__(**kwargs, env_prefix=self.env_prefix, file_path=config_file)
+        self.update(kwargs)
+        self.load_from_file(kwargs.get("config_file", home_config_file), not_exists_ok=True)
+        self.load_from_environment(prefix=self.env_prefix)
         self.pdf_keywords = list(self.pdf_keywords)
         self.parse_pdf_keywords(pdf_keywords)

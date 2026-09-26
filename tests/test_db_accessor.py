@@ -3,6 +3,7 @@ from jinja2 import Environment
 
 from resume_generator.data import DBAccessor
 from resume_generator.resume import Model
+from resume_generator.selection import Selection
 
 
 def test_rejects_non_engine():
@@ -111,3 +112,15 @@ def test_query_helpers_are_callable_from_templates(accessor):
     ).render()
 
     assert rendered == "Test Engineer"
+
+
+def test_table_names_lists_every_model(accessor):
+    assert {"Skill", "Experience", "ExperienceDetail", "Project"} <= set(accessor.table_names)
+
+
+def test_excluded_rows_are_hidden_from_whole_tables_and_filters(engine):
+    selection = Selection(exclusions={"Project": {"hobby-project"}})
+
+    with DBAccessor(base_model=Model, engine=engine, selection=selection) as accessor:
+        assert [project.canonical_name for project in accessor["Project"]] == ["test-project"]
+        assert accessor.filter_where("Project", category_name="Hobby") == []

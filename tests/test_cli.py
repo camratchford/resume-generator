@@ -364,3 +364,46 @@ def test_profile_overrides_extra_option(default_files, tmp_path, captured_render
 
     assert result.exit_code == 0, result.output
     assert captured_render[0]["template_name"] == "resume.md"
+
+
+def test_config_exclude_hides_a_project(home_dir, tmp_path, captured_render):
+    (home_dir / "config.yml").write_text("exclude:\n  Project: [hobby-project]\n")
+
+    result = invoke(home_dir, tmp_path, "-t", "resume.md", "-s", "resume.css")
+
+    assert result.exit_code == 0, result.output
+    assert captured_render[0]["selection"].exclusions == {"Project": {"hobby-project"}}
+
+
+def test_profile_include_overrides_config_exclude_end_to_end(home_dir, tmp_path, captured_render):
+    (home_dir / "config.yml").write_text("exclude:\n  ExperienceDetail: [test-co-testing]\n")
+    (home_dir / "profiles" / "devops.yml").write_text(
+        "categories: [DevOps]\ninclude:\n  ExperienceDetail: [test-co-testing]\n"
+    )
+
+    result = invoke(home_dir, tmp_path, "-t", "resume.md", "-s", "resume.css", "--profile", "devops")
+
+    assert result.exit_code == 0, result.output
+    selection = captured_render[0]["selection"]
+    assert selection.exclusions == {}
+    assert selection.pins == {"ExperienceDetail": ["test-co-testing"]}
+    assert captured_render[0]["ranker"].selection is selection
+
+
+def test_unknown_selection_reference_is_rejected_with_a_suggestion(home_dir, tmp_path, captured_render):
+    (home_dir / "config.yml").write_text("exclude:\n  Skill: [Terrafrom]\n")
+
+    result = invoke(home_dir, tmp_path, "-t", "resume.md", "-s", "resume.css")
+
+    assert result.exit_code != 0
+    assert "no Skill named 'Terrafrom' (did you mean: Terraform)" in str(result.exception)
+    assert captured_render == []
+
+
+def test_conflicting_selection_in_one_file_is_rejected(home_dir, tmp_path, captured_render):
+    (home_dir / "config.yml").write_text("include:\n  Skill: [Python]\nexclude:\n  Skill: [Python]\n")
+
+    result = invoke(home_dir, tmp_path, "-t", "resume.md", "-s", "resume.css")
+
+    assert result.exit_code != 0
+    assert "config.yml both includes and excludes: Skill: Python" in str(result.exception)

@@ -19,6 +19,8 @@ class Config(BYOConfig):
     page_breaks: str = "h3"
     template_name: str = "default.md"
     css_stylesheet_name: str = "default.css"
+    include: dict | None = None
+    exclude: dict | None = None
 
     manual_home_dir: Path | None = None
     manual_templates_dir: Path | None = None

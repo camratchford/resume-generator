@@ -9,6 +9,7 @@ from resume_generator.data import DBAccessor
 from resume_generator.page_breaks import PageBreakMode
 from resume_generator.ranking import CategoryRanker, PositionRanker, Ranker, load_profile
 from resume_generator.resume import Model
+from resume_generator.selection import Selection, SelectionError, row_key
 
 TEMPLATES_PANEL = "Templates"
 DIRECTORIES_PANEL = "Directories"
@@ -282,7 +283,32 @@ def resolve_page_break_mode(config: Config, profile: dict[str, Any], mode: PageB
         raise TyperException(f"Unknown page_breaks mode {value!r}. Expected one of: {modes}") from error
 
 
-def build_ranker(config: Config, profile: dict[str, Any], categories: str) -> Ranker:
+def build_selection(config: Config, profile: dict[str, Any]) -> Selection:
+    config_layer = {"include": config.get("include"), "exclude": config.get("exclude")}
+    try:
+        return Selection.from_layers([("the profile", profile), ("config.yml", config_layer)])
+    except SelectionError as error:
+        raise TyperException(str(error)) from error
+
+
+def raise_on_unknown_selection(selection: Selection, engine: Engine) -> None:
+    if not selection.references():
+        return
+
+    with DBAccessor(base_model=Model, engine=engine) as db_accessor:
+        known_keys = {}
+        for table in db_accessor.table_names:
+            keys = {row_key(row) for row in db_accessor[table]}
+            if None not in keys:
+                known_keys[table] = keys
+    problems = selection.unknown_references(known_keys)
+    if problems:
+        raise TyperException("Invalid include/exclude: " + "; ".join(problems))
+
+
+def build_ranker(
+    config: Config, profile: dict[str, Any], categories: str, selection: Selection | None = None
+) -> Ranker:
     category_names = profile.get("categories", [])
     details_limit = parse_limit("bullets_per_job", profile.get("bullets_per_job", config.bullets_per_job))
     skills_limit = parse_limit("skills_per_job", profile.get("skills_per_job", config.skills_per_job))
@@ -290,8 +316,8 @@ def build_ranker(config: Config, profile: dict[str, Any], categories: str) -> Ra
         category_names = parse_category_names(categories)
 
     if not category_names:
-        return PositionRanker(details_limit, skills_limit)
-    return CategoryRanker(category_names, details_limit, skills_limit)
+        return PositionRanker(details_limit, skills_limit, selection)
+    return CategoryRanker(category_names, details_limit, skills_limit, selection)
 
 
 def raise_on_unknown_categories(ranker: Ranker, engine: Engine) -> None:

@@ -5,6 +5,7 @@ from sqlalchemy.exc import SQLAlchemyError
 from sqlalchemy.orm import DeclarativeBase, Session
 
 from resume_generator.data.model_field_typing import get_model_base_model_list, get_primary_key_reference
+from resume_generator.selection import Selection
 
 
 class DBAccessor(Mapping):
@@ -45,8 +46,10 @@ class DBAccessor(Mapping):
         base_model: Type[DeclarativeBase],
         engine: Engine,
         sqlalchemy_session: Session = None,
+        selection: Selection = None,
         **data_key_values,
     ):
+        self._selection = selection or Selection()
         if sqlalchemy_session is not None:
             self._session = sqlalchemy_session
 
@@ -66,8 +69,12 @@ class DBAccessor(Mapping):
             "filter_where_eval": self.filter_where_eval,
         }
 
+    @property
+    def table_names(self) -> list[str]:
+        return list(self._models)
+
     def _get_from_db(self, model: Type[DeclarativeBase]):
-        return self._session.scalars(select(model)).all()
+        return self._selection.filter(self._session.scalars(select(model)).all())
 
     def get_by_pk(self, model_name: str, **key_value_kw_params):
         if model_name not in self._models:
@@ -84,7 +91,7 @@ class DBAccessor(Mapping):
         select_statement = select(model).where(
             *list(getattr(model, attr) == value for attr, value in filter_kw_params.items())
         )
-        return self._session.scalars(select_statement).all()
+        return self._selection.filter(self._session.scalars(select_statement).all())
 
     def filter_where_eval(self, model_name: str, eval_statement: str):
         model = self._models.get(model_name)

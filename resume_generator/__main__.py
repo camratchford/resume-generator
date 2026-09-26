@@ -24,9 +24,11 @@ from resume_generator.cli import (
     TemplatesDirOption,
     build_config_kwargs,
     build_ranker,
+    build_selection,
     load_selected_profile,
     raise_on_mutually_exclusive_params,
     raise_on_unknown_categories,
+    raise_on_unknown_selection,
     resolve_page_break_mode,
     resolve_setting,
     split_file_path,
@@ -79,7 +81,9 @@ def render(
     db_engine = initialize_db(config)
     import_yaml_data(db_engine, config)
     profile = load_selected_profile(config, profile_name)
-    ranker = build_ranker(config, profile, categories)
+    selection = build_selection(config, profile)
+    raise_on_unknown_selection(selection, db_engine)
+    ranker = build_ranker(config, profile, categories, selection)
     raise_on_unknown_categories(ranker, db_engine)
     page_break_mode = resolve_page_break_mode(config, profile, page_breaks)
     template_name = resolve_setting(template_name, profile, config, "template_name")
@@ -96,6 +100,7 @@ def render(
         generate_markdown=markdown_output,
         ranker=ranker,
         page_breaks=page_break_mode,
+        selection=selection,
     )
 
 

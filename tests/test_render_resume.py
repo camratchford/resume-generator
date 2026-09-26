@@ -6,9 +6,10 @@ from resume_generator.config import Config
 from resume_generator.db import initialize_db
 from resume_generator.import_data import import_yaml_data
 from resume_generator.page_breaks import PageBreakMode, page_break_css
-from resume_generator.ranking import CategoryRanker
+from resume_generator.ranking import CategoryRanker, PositionRanker
 from resume_generator.render_resume import render_resume
 from resume_generator.resume import Model
+from resume_generator.selection import Selection
 
 
 @pytest.fixture
@@ -205,3 +206,30 @@ def test_anywhere_mode_adds_keep_together_rules_without_sections(config, engine,
     call = captured_pdf_calls[0]
     assert "page-break-section" not in call["html"]
     assert "break-after: avoid" in call["css"]
+
+
+def test_excluded_rows_disappear_from_rendered_output(config, engine, tmp_path, captured_pdf_calls):
+    selection = Selection(exclusions={"Project": {"hobby-project"}, "Skill": {"Terraform"}})
+
+    render(
+        config,
+        engine,
+        tmp_path,
+        generate_markdown=True,
+        selection=selection,
+        ranker=PositionRanker(selection=selection),
+    )
+
+    markdown = (tmp_path / "Test Candidate - Resume.md").read_text()
+    assert "Hobby Project" not in markdown
+    assert "Test Project" in markdown
+    assert "Terraform" not in markdown
+
+
+def test_pinned_detail_leads_its_job(config, engine, tmp_path, captured_pdf_calls):
+    selection = Selection(pins={"ExperienceDetail": ["test-co-infrastructure"]})
+
+    render(config, engine, tmp_path, generate_markdown=True, ranker=PositionRanker(selection=selection))
+
+    markdown = (tmp_path / "Test Candidate - Resume.md").read_text()
+    assert markdown.index("- Automated test infrastructure.") < markdown.index("- Did testing things.")

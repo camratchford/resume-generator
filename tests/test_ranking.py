@@ -4,6 +4,7 @@ import pytest
 from jinja2 import Environment
 
 from resume_generator.ranking import CategoryRanker, PositionRanker, load_profile
+from resume_generator.selection import Selection
 
 
 def make_skill(name, *category_names, usage_count=0, is_keyword=False):
@@ -225,3 +226,38 @@ def test_kind_and_limit_work_together_from_a_template():
     )
 
     assert template.render(skills=[INFRASTRUCTURE_AS_CODE, PYTHON, TERRAFORM]) == "Terraform"
+
+
+class PinnableDetail(SimpleNamespace):
+    @property
+    def _primary_keys(self):
+        return {"canonical_name": self.name}
+
+
+def pinnable_detail(name, position, *skills):
+    return PinnableDetail(name=name, position=position, skills=list(skills))
+
+
+PIN_AND_EXCLUDE = Selection(pins={"PinnableDetail": ["pinned"]}, exclusions={"PinnableDetail": {"hidden"}})
+
+
+@pytest.mark.parametrize(
+    "ranker",
+    [PositionRanker(selection=PIN_AND_EXCLUDE), CategoryRanker(["Networking"], selection=PIN_AND_EXCLUDE)],
+    ids=["position", "category"],
+)
+def test_rankers_put_pinned_details_first_and_drop_excluded_ones(ranker):
+    details = [
+        pinnable_detail("network", 0, DNS),
+        pinnable_detail("hidden", 1, DNS),
+        pinnable_detail("pinned", 2, VIM),
+    ]
+
+    assert names(ranker.rank_details(details)) == ["pinned", "network"]
+
+
+def test_pinned_details_count_toward_the_limit():
+    ranker = CategoryRanker(["Networking"], details_limit=1, selection=PIN_AND_EXCLUDE)
+    details = [pinnable_detail("network", 0, DNS), pinnable_detail("pinned", 1, VIM)]
+
+    assert names(ranker.rank_details(details)) == ["pinned"]

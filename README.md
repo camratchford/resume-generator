@@ -71,6 +71,7 @@ Templates are Jinja2 Markdown. Every table is available by its model name (`Cand
 |------------------|----------------------------------------------------------------------------------|
 | `rank_details`   | Order an experience's details by the active ranking, capped at `bullets_per_job` |
 | `rank_skills`    | Order skills by the active ranking, capped at `skills_per_job`                   |
+| `selected`       | Drop rows excluded by the profile or `config.yml` from any collection            |
 | `phone_num_fmt`  | Format an 11-digit phone number as `1-555-123-4567`                              |
 | `month_year_fmt` | Format a date as `January 2024`                                                  |
 
@@ -123,6 +124,27 @@ resume-generator render out/ --profile field
 
 `--categories` overrides a profile's category list. Unknown category or profile names are reported with the valid options.
 
+## Including and excluding rows
+
+Profiles and `config.yml` can pin or hide specific rows, referred to by table name and primary key (the `canonical_name`, or `name` for skills and categories):
+
+```yaml
+include:
+  ExperienceDetail: [devon-drill-site]
+  Skill: [Microwave Radio]
+exclude:
+  ExperienceDetail: [cmg-printer-contract]
+  Skill: [Vim]
+  Project: [zenplate]
+```
+
+- `exclude` hides a row everywhere: from whole tables such as `Project`, and from collections filtered through `rank_details`, `rank_skills`, or `selected`. Excluding a skill hides it without changing how the bullets that use it rank.
+- `include` pins a row: pinned details and skills come first, in the order listed, and count toward `bullets_per_job` and `skills_per_job`.
+- The most specific layer that mentions a row decides it, so a profile's `include` overrides an `exclude` in `config.yml`, and the other way around. Including and excluding the same row in one file is an error.
+- Unknown tables and rows are reported, with suggestions for near misses.
+
+Use `selected` on any other collection a template shows, such as `{{ edu.skills | selected | join('||') }}`, so exclusions apply there too.
+
 ## Page breaks
 
 By default, each `###` section (a job, project, or education entry) is kept together on one page. Set the mode with `--page-breaks`, `page_breaks` in a profile, or `page_breaks` in `config.yml`, in that order of precedence:
@@ -146,7 +168,7 @@ Settings are resolved in this order, first match wins:
 5. `config.yml`
 6. The built-in default
 
-Settings that profiles can override: `template_name`, `css_stylesheet_name`, `bullets_per_job`, `skills_per_job`, and `page_breaks`.
+Settings that profiles can override: `template_name`, `css_stylesheet_name`, `bullets_per_job`, `skills_per_job`, and `page_breaks`. `include` and `exclude` are merged row by row instead, as described in [Including and excluding rows](#including-and-excluding-rows).
 
 ```yaml
 # config.yml

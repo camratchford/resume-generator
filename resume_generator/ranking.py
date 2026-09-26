@@ -3,6 +3,8 @@ from typing import Any, Protocol, Sequence
 
 from yaml import safe_load
 
+from resume_generator.selection import Selection
+
 SKILL_KINDS = ("tool", "keyword")
 
 
@@ -46,25 +48,35 @@ def round_robin(queues: list[list[Any]]) -> list[Any]:
 
 
 class PositionRanker:
-    def __init__(self, details_limit: int | None = None, skills_limit: int | None = None):
+    def __init__(
+        self, details_limit: int | None = None, skills_limit: int | None = None, selection: Selection | None = None
+    ):
         self.details_limit = details_limit
         self.skills_limit = skills_limit
+        self.selection = selection or Selection()
 
     def rank_details(self, details: Sequence[Any], limit: int | None = None) -> list[Any]:
-        return truncate(sorted(details, key=position_key), limit, self.details_limit)
+        ranked = self.selection.order(sorted(details, key=position_key))
+        return truncate(ranked, limit, self.details_limit)
 
     def rank_skills(self, skills: Sequence[Any], limit: int | None = None, kind: str | None = None) -> list[Any]:
-        return truncate(sorted(filter_kind(skills, kind), key=usage_key), limit, self.skills_limit)
+        ranked = self.selection.order(sorted(filter_kind(skills, kind), key=usage_key))
+        return truncate(ranked, limit, self.skills_limit)
 
 
 class CategoryRanker:
     def __init__(
-        self, category_names: Sequence[str], details_limit: int | None = None, skills_limit: int | None = None
+        self,
+        category_names: Sequence[str],
+        details_limit: int | None = None,
+        skills_limit: int | None = None,
+        selection: Selection | None = None,
     ):
         self.category_names = list(category_names)
         self.category_ranks = {name: rank for rank, name in enumerate(self.category_names)}
         self.details_limit = details_limit
         self.skills_limit = skills_limit
+        self.selection = selection or Selection()
 
     def matching_ranks(self, skill: Any) -> list[int]:
         return [
@@ -79,7 +91,8 @@ class CategoryRanker:
         return self.best_rank(ranks), -len(ranks), *position_key(detail)
 
     def rank_details(self, details: Sequence[Any], limit: int | None = None) -> list[Any]:
-        return truncate(sorted(details, key=self.detail_sort_key), limit, self.details_limit)
+        ranked = self.selection.order(sorted(details, key=self.detail_sort_key))
+        return truncate(ranked, limit, self.details_limit)
 
     def rank_skills(self, skills: Sequence[Any], limit: int | None = None, kind: str | None = None) -> list[Any]:
         skills_by_usage = sorted(filter_kind(skills, kind), key=usage_key)
@@ -90,7 +103,7 @@ class CategoryRanker:
         ranked = round_robin(queues)
         ranked_names = {skill.name for skill in ranked}
         ranked += [skill for skill in skills_by_usage if skill.name not in ranked_names]
-        return truncate(ranked, limit, self.skills_limit)
+        return truncate(self.selection.order(ranked), limit, self.skills_limit)
 
 
 def load_profile(profiles_dir: Path, profile_name: str) -> dict[str, Any]:

@@ -1,0 +1,30 @@
+- canonical_name: grimoire-collecting
+  name: Grimoire Collecting
+  description: Restoring and cataloguing rare grimoires, with a particular fondness for books that bite.
+  date_from: 0716-01-01
+  date_to: null
+  candidate_name: Ixar El'Edel
+  skills:
+    - name: Grimoire Writing
+    - name: Old Enochian
+    - name: Artifact Appraisal
+
+- canonical_name: competitive-dueling
+  name: Competitive Dueling
+  description: Three-time runner-up at the Tower's midwinter dueling tournament, retired undefeated in the over-500 bracket.
+  date_from: 0712-01-01
+  date_to: 0721-12-31
+  candidate_name: Ixar El'Edel
+  skills:
+    - name: Dueling
+    - name: Warding
+
+- canonical_name: stargazing
+  name: Stargazing
+  description: Charting omens in the night sky over the Mirewood Bog.
+  date_from: 2023-03-01
+  date_to: null
+  candidate_name: Ixar El'Edel
+  skills:
+    - name: Future Scrying
+    - name: Astromancy

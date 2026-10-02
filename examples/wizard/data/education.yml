@@ -1,0 +1,14 @@
+- canonical_name: tower-apprenticeship
+  institution: The Tower
+  location: 5th Extra-dimensional Plane of Nonexistence
+  received: Wizard's Apprenticeship
+  date_from: 0710-04-02
+  date_to: 0715-06-28
+  candidate_name: Ixar El'Edel
+  skills:
+    - name: Transfiguration
+    - name: Spirit Summoning
+    - name: Demon Summoning
+    - name: Dueling
+    - name: Prestidigitation
+    - name: Animal Friendship

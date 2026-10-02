@@ -1,0 +1,4 @@
+template_name: no-hobbies.md
+css_stylesheet_name: resume.css
+bullets_per_job: 4
+skills_per_job: 8

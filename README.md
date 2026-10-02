@@ -39,6 +39,14 @@ home/
 └── config.yml   Configuration defaults (optional)
 ```
 
+[`examples/wizard`](examples/wizard) is a complete, working home directory with data files, templates, a stylesheet with bundled fonts, profiles, and a `config.yml`. Copy it as a starting point, or render it to see every feature in action:
+
+```shell
+resume-generator render out/ --home-dir examples/wizard --profile demonology
+```
+
+Its rendered resumes, one per profile, are in [`examples/wizard/output`](examples/wizard/output), and `examples/wizard/generate.sh` regenerates them.
+
 ### Data files
 
 Each file in `data/` holds a list of records for one table: `candidate.yml`, `experience.yml`, `education.yml`, `project.yml`, `project_category.yml`, `hobby.yml`, `skill.yml`, and `skill_category.yml`. Records refer to each other by name, and a skill referenced anywhere is created if it doesn't exist yet.

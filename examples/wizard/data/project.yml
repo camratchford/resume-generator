@@ -1,0 +1,96 @@
+- canonical_name: banishment-runbook
+  name: Banishment Runbook
+  href: null
+  description: A step-by-step grimoire for the taskforce covering identification, containment, and banishment of the twelve most common lesser demons, with a quick-reference table of the incantations each one is weak to.
+  date_from: 2025-06-01
+  date_to: null
+  category_name: Professional
+  candidate_name: Ixar El'Edel
+  education_canonical_name: null
+  experience_canonical_name: dark-circle-demon-consultant
+  hobby_canonical_name: null
+  skills:
+    - name: Grimoire Writing
+    - name: Demon Banishing
+    - name: Udug Hul
+    - name: Maqlû
+    - name: Process Improvement
+
+- canonical_name: grimoire-index
+  name: Grimoire Index
+  href: null
+  description: A cross-referenced index of my grimoire collection, searchable by spell, author, and how badly each book bites.
+  date_from: 2023-06-01
+  date_to: null
+  category_name: Hobby
+  candidate_name: Ixar El'Edel
+  education_canonical_name: null
+  experience_canonical_name: null
+  hobby_canonical_name: grimoire-collecting
+  skills:
+    - name: Grimoire Writing
+    - name: Old Enochian
+
+- canonical_name: dungeon-reading-circle
+  name: Dungeon Reading Circle
+  href: null
+  description: A weekly reading circle for fellow inmates, run by torchlight for eleven centuries. Graduates read Old Enochian fluently and two went on to become licensed scribes.
+  date_from: 1100-01-01
+  date_to: 2022-12-31
+  category_name: Volunteering
+  candidate_name: Ixar El'Edel
+  education_canonical_name: null
+  experience_canonical_name: dungeon-career-break
+  hobby_canonical_name: null
+  skills:
+    - name: Old Enochian
+    - name: Mentorship
+    - name: Teamwork
+
+- canonical_name: wish-linter
+  name: Monkey's Paw Wish Linter
+  href: null
+  description: A checklist and accompanying incantation that flags ambiguous wording in a wish before it is granted, catching the most common loopholes exploited by monkey's paws and less scrupulous djinn.
+  date_from: 0721-08-01
+  date_to: 0721-12-31
+  category_name: Consultancy
+  candidate_name: Ixar El'Edel
+  education_canonical_name: null
+  experience_canonical_name: jkast-djinn-negotiation-specialist
+  hobby_canonical_name: null
+  skills:
+    - name: Wish Proofreading
+    - name: Spellcraft
+    - name: Risk Mitigation
+
+- canonical_name: golem-retraining
+  name: Golem Labour Retraining Program
+  href: null
+  description: A program for taking golems that failed animation and retraining them for manual labour around the Tower, including a graded set of commands for golems with partial sentience.
+  date_from: 0718-01-01
+  date_to: 0721-05-31
+  category_name: Professional
+  candidate_name: Ixar El'Edel
+  education_canonical_name: null
+  experience_canonical_name: tower-wizards-assistant
+  hobby_canonical_name: null
+  skills:
+    - name: Golemancy
+    - name: Matter Shaping
+    - name: Mentorship
+
+- canonical_name: imp-binding-thesis
+  name: On the Binding of Lesser Imps
+  href: null
+  description: My apprenticeship thesis, comparing six binding circles for lesser imps and recommending the one least likely to set the lecture hall on fire.
+  date_from: 0714-09-01
+  date_to: 0715-06-01
+  category_name: School
+  candidate_name: Ixar El'Edel
+  education_canonical_name: tower-apprenticeship
+  experience_canonical_name: null
+  hobby_canonical_name: null
+  skills:
+    - name: Demon Summoning
+    - name: Demonology
+    - name: Warding

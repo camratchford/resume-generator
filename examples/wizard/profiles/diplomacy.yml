@@ -1,0 +1,11 @@
+categories:
+  - Diplomacy
+  - Djinn Affairs
+  - Arcane Law
+  - Divination
+bullets_per_job: 3
+include:
+  ExperienceDetail: [dungeon-reading-circle]
+exclude:
+  ExperienceDetail: [tower-artifacts]
+  Skill: [Conducting Ritual Sacrifice]

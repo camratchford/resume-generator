@@ -121,6 +121,16 @@ def test_scalars_are_coerced_to_the_declared_type(tmp_path):
         assert session.get(Candidate, {"name": "Test"}).telephone == "15551234567"
 
 
+def test_null_scalars_stay_null_instead_of_becoming_the_string_none(tmp_path):
+    engine = _make_engine(tmp_path)
+
+    with DataImporter(base_model=Model, engine=engine) as importer:
+        importer.load_data("- name: Test\n  telephone: null\n", Candidate)
+
+    with Session(engine) as session:
+        assert session.get(Candidate, {"name": "Test"}).telephone is None
+
+
 def test_date_strings_are_coerced_to_dates(tmp_path):
     engine = _make_engine(tmp_path)
 

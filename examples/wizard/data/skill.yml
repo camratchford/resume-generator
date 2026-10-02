@@ -1,0 +1,191 @@
+- name: Demon Banishing
+  categories:
+    - name: Demonology
+    - name: Combat Magic
+
+- name: Demon Dispatching
+  categories:
+    - name: Demonology
+    - name: Combat Magic
+
+- name: Demon Summoning
+  categories:
+    - name: Demonology
+    - name: Ritual Magic
+
+- name: Udug Hul
+  categories:
+    - name: Demonology
+    - name: Ritual Magic
+
+- name: Maqlû
+  categories:
+    - name: Demonology
+    - name: Ritual Magic
+
+- name: ortha
+  categories:
+    - name: Ritual Magic
+
+- name: ġealdor
+  categories:
+    - name: Ritual Magic
+
+- name: Conducting Ritual Sacrifice
+  categories:
+    - name: Ritual Magic
+
+- name: Spirit Summoning
+  categories:
+    - name: Ritual Magic
+    - name: Diplomacy
+
+- name: Djinn Entombment
+  categories:
+    - name: Djinn Affairs
+    - name: Ritual Magic
+
+- name: Magical Entombment/Re-entombment
+  categories:
+    - name: Djinn Affairs
+    - name: Artificery
+
+- name: Djinn Negotiation
+  categories:
+    - name: Djinn Affairs
+    - name: Diplomacy
+
+- name: Wish Proofreading
+  categories:
+    - name: Djinn Affairs
+    - name: Arcane Law
+
+- name: Ancient Avestic Law
+  categories:
+    - name: Arcane Law
+    - name: Djinn Affairs
+
+- name: Negotiating with Spirits (lesser/minor)
+  categories:
+    - name: Diplomacy
+
+- name: Old Enochian
+  categories:
+    - name: Arcane Law
+    - name: Leadership
+
+- name: Curse Reversal
+  categories:
+    - name: Ritual Magic
+    - name: Djinn Affairs
+
+- name: Future Scrying
+  categories:
+    - name: Divination
+
+- name: Astromancy
+  categories:
+    - name: Divination
+
+- name: Golemancy
+  categories:
+    - name: Artificery
+
+- name: Matter Shaping
+  categories:
+    - name: Artificery
+
+- name: Transfiguration
+  categories:
+    - name: Artificery
+    - name: Combat Magic
+
+- name: Artifact Appraisal
+  categories:
+    - name: Artificery
+
+- name: Warding
+  categories:
+    - name: Artificery
+    - name: Combat Magic
+
+- name: Grimoire Writing
+  categories:
+    - name: Leadership
+    - name: Arcane Law
+
+- name: Prestidigitation
+  categories:
+    - name: Combat Magic
+
+- name: Dueling
+  categories:
+    - name: Combat Magic
+
+- name: Animal Friendship
+  categories:
+    - name: Beasts & Familiars
+
+- name: Familiar Bonding
+  categories:
+    - name: Beasts & Familiars
+
+- name: Meditation
+  categories:
+    - name: Leadership
+
+- name: Demonology
+  is_keyword: true
+  categories:
+    - name: Demonology
+
+- name: Spellcraft
+  is_keyword: true
+  categories:
+    - name: Ritual Magic
+    - name: Combat Magic
+
+- name: Arcane Compliance
+  is_keyword: true
+  categories:
+    - name: Arcane Law
+
+- name: Contract Negotiation
+  is_keyword: true
+  categories:
+    - name: Diplomacy
+    - name: Djinn Affairs
+
+- name: Stakeholder Management
+  is_keyword: true
+  categories:
+    - name: Diplomacy
+    - name: Leadership
+
+- name: Risk Mitigation
+  is_keyword: true
+  categories:
+    - name: Arcane Law
+    - name: Divination
+
+- name: Incident Response
+  is_keyword: true
+  categories:
+    - name: Demonology
+    - name: Leadership
+
+- name: Process Improvement
+  is_keyword: true
+  categories:
+    - name: Leadership
+
+- name: Mentorship
+  is_keyword: true
+  categories:
+    - name: Leadership
+    - name: Beasts & Familiars
+
+- name: Teamwork
+  is_keyword: true
+  categories:
+    - name: Leadership

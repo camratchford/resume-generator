@@ -1,0 +1,458 @@
+
+<!DOCTYPE html>
+<html lang="en-us">
+<head>
+<title>Ixar El'Edel - Resume</title>
+<meta http-equiv="Content-type" content="text/html;charset=UTF-8">
+
+<base href="file:///projects/resume-generator/examples/wizard/css/resume.css">
+
+
+<meta name="author" content="Ixar El'Edel">
+
+<meta name="generator" content="resume_generator">
+<meta name="keywords" content="resume,CV,Ixar El'Edel">
+<meta name="dcterms.created" content="2026-10-02">
+<meta name="dcterms.modified" content="2026-10-02">
+<meta name="description" content="Ixar El'Edel's resume">
+
+<meta name="Copyright" content="© 2026 Ixar El'Edel">
+
+<style>
+h1, h2, h3, h4, h5, h6 { break-after: avoid; }
+li, .row, .flex-wrap { break-inside: avoid; }
+section.page-break-section { break-inside: avoid; }
+/* https://github.com/microsoft/vscode/blob/master/extensions/markdown-language-features/media/markdown.css */
+/*---------------------------------------------------------------------------------------------
+ *  Copyright (c) Microsoft Corporation. All rights reserved.
+ *  Licensed under the MIT License. See License.txt in the project root for license information.
+ *--------------------------------------------------------------------------------------------*/
+
+
+/* Nerd Font icons: an installed copy, then the one in ../fonts, then the CDN for HTML opened elsewhere */
+@font-face {
+	font-family: "Nerd Font Icons";
+	src: local("JetBrainsMono NF Regular"),
+		 local("JetBrainsMonoNF-Regular"),
+		 url("../fonts/JetBrainsMonoNerdFont-Regular.woff2") format("woff2"),
+		 url("https://cdn.jsdelivr.net/gh/mshaugh/nerdfont-webfonts@v3.3.0/build/fonts/JetBrainsMonoNerdFont-Regular.woff2")
+		 format("woff2");
+	font-style: normal;
+	font-weight: normal;
+}
+
+/* Lato: an installed copy, then the one in ../fonts, then the CDN for HTML opened elsewhere */
+@font-face {
+	font-family: "Lato";
+	src: local("Lato Regular"),
+		 local("Lato-Regular"),
+		 url("../fonts/Lato-Regular.ttf") format("truetype"),
+		 url("https://cdn.jsdelivr.net/fontsource/fonts/lato@latest/latin-400-normal.woff2") format("woff2");
+	font-style: normal;
+	font-weight: normal;
+}
+
+@font-face {
+	font-family: "Lato";
+	src: local("Lato Bold"),
+		 local("Lato-Bold"),
+		 url("../fonts/Lato-Bold.ttf") format("truetype"),
+		 url("https://cdn.jsdelivr.net/fontsource/fonts/lato@latest/latin-700-normal.woff2") format("woff2");
+	font-style: normal;
+	font-weight: bold;
+}
+
+@font-face {
+	font-family: "Lato";
+	src: local("Lato Italic"),
+		 local("Lato-Italic"),
+		 url("../fonts/Lato-Italic.ttf") format("truetype"),
+		 url("https://cdn.jsdelivr.net/fontsource/fonts/lato@latest/latin-400-italic.woff2") format("woff2");
+	font-style: italic;
+	font-weight: normal;
+}
+
+@font-face {
+	font-family: "Lato";
+	src: local("Lato Bold Italic"),
+		 local("Lato-BoldItalic"),
+		 url("../fonts/Lato-BoldItalic.ttf") format("truetype"),
+		 url("https://cdn.jsdelivr.net/fontsource/fonts/lato@latest/latin-700-italic.woff2") format("woff2");
+	font-style: italic;
+	font-weight: bold;
+}
+
+body {
+	font-family: "Lato", sans-serif;
+	font-size: 13px;
+	padding: 0;
+	margin: 0;
+	line-height: 18px;
+	word-wrap: break-word;
+}
+
+a {
+	text-decoration: none;
+	color: #0a694a;
+}
+
+a:hover {
+	text-decoration: underline;
+}
+
+p {
+	margin: 0.3em 0 0.3em 0;
+}
+
+hr {
+	border: 0;
+	height: 2px;
+	border-bottom: 2px solid;
+	padding: 5px 0;
+}
+
+h1 {
+	color: black;
+}
+
+h1, h2, h3, h4 {
+	font-weight: normal;
+	margin-left: 0;
+}
+
+h2 {
+	margin: 1em 0 0.5em 0;
+}
+
+h3 {
+	margin: 1em 0 0.5em 0;
+	font-weight: bold;
+}
+
+h4 {
+	font-weight: bold;
+	margin: 0.5em 0 0.5em 0;
+}
+
+ul {
+	margin: 0 1em 0 0;
+	list-style-type: disc;
+	padding-left: 20px;
+}
+
+ul li ul {
+	padding-left: 10px;
+}
+
+ul li:first-child {
+	margin-top: 0.1em;
+}
+
+ul li:last-child {
+	margin-bottom: 0.3em;
+}
+
+blockquote {
+	margin: 0 7px 0 5px;
+	padding: 0 16px 0 10px;
+	border-left: 5px solid #0f966d;
+	background: rgba(127, 127, 127, 0.1);
+}
+
+/* Page Break : use <div class="page"/> or %:pg:% to insert page break */
+.page {
+	page-break-after: always;
+}
+
+.row {
+	display: flex;
+	flex-direction: row;
+	justify-content: space-between;
+}
+
+.column {
+	display: block;
+	text-align: center;
+}
+
+span.nf {
+	display: inline-block;
+	font-family: "Nerd Font Icons", "JetBrainsMono Nerd Font", monospace;
+	height: auto;
+	margin-bottom: -10px;
+	line-height: 18px;
+	font-size: 15px;
+	padding: 5px;
+}
+
+.flex-wrap {
+	padding-left: 10px;
+	display: flex;
+	flex-direction: row;
+	flex-wrap: wrap;
+	gap: 5px;
+	width: 100vw;
+}
+
+.bubble {
+	padding: 1px 5px;
+	font-size: 90%;
+	line-height: 18px;
+	border-radius: 5px;
+	background-color: #dedcdf;
+}
+
+span.muted-text {
+	color: #606060;
+}
+
+</style>
+</head>
+<body>
+<div class="markdown-container">
+    <h1>IXAR EL'EDEL</h1>
+<p>
+<div class="row">
+<div class="column"><a href="mailto:ixar-eledel@wizardmail.example"><span class="nf">󰇰</span> ixar-eledel@wizardmail.example</a></div>
+<div class="column"><a href="tel:ᛊᛈᛉᛋᚸᛥ"><span class="nf">󰏲</span> ᛊᛈᛉᛋᚸᛥ</a></div>
+<div class="column"><a href="https://www.linkedin.com/in/ixar-eledel"><span class="nf"></span> ixar-eledel</a></div>
+<div class="column"><a href="https://github.com/ixar-eledel"><span class="nf"></span> ixar-eledel</a></div>
+</div>
+</p>
+<hr />
+<h2>SUMMARY</h2>
+<p class="flex-wrap">Underworld-based demon consultant with 1,300+ years of experience in sorcery, wizardry, and forbidden knowledge. Banishes imps, succubi, and capras for The Dark Circle, entombs djinn under ancient Avestic law, and negotiates fair terms with the Xhindi on behalf of mortal clients. Trained under Dolo the Dastardly at The Tower, with a background in golem retraining, familiar placement, and curse reversal. Recently completed a 1,301-year career break and holds a current, fully renewed Wizarding Licence.</p>
+
+<h2>SKILLS</h2>
+<p>
+<div class="flex-wrap">
+<div class="bubble">Demon Banishing</div>
+<div class="bubble">Curse Reversal</div>
+<div class="bubble">Warding</div>
+<div class="bubble">Old Enochian</div>
+<div class="bubble">Demon Dispatching</div>
+<div class="bubble">Demon Summoning</div>
+<div class="bubble">Dueling</div>
+<div class="bubble">Grimoire Writing</div>
+<div class="bubble">Udug Hul</div>
+<div class="bubble">Maqlû</div>
+</div>
+</p>
+<h2>CORE COMPETENCIES</h2>
+<p>
+<div class="flex-wrap">
+<div class="bubble">Demonology</div>
+<div class="bubble">Spellcraft</div>
+<div class="bubble">Risk Mitigation</div>
+<div class="bubble">Incident Response</div>
+<div class="bubble">Arcane Compliance</div>
+<div class="bubble">Mentorship</div>
+<div class="bubble">Stakeholder Management</div>
+<div class="bubble">Contract Negotiation</div>
+</div>
+</p>
+<h2>WORK EXPERIENCE</h2>
+<section class="page-break-section level-3" data-section="0"><h3>Demon Consultant <br> <a href="">The Dark Circle</a></h3>
+<blockquote>
+<p>
+<div class="row">
+<div class="column">Underworld, Sub-sector C</div>
+<div class="column"><em>April 2025 - Present</em></div>
+</div>
+</p>
+</blockquote>
+<section class="page-break-section level-4" data-section="1"><h4>Duties</h4>
+<ul>
+<li>Performed incantations including Udug Hul, Maqlû, ortha, and ġealdor, adapting each to the target's place in the infernal hierarchy.</li>
+<li>Hunted and banished imps, succubi/incubi, and capras across 12 infernal sub-sectors, closing 300+ incursion reports.</li>
+<li>Wrote the taskforce's banishment runbooks, cutting the average exorcism from three nights to one.</li>
+<li>Participated in the taskforce's on-call rotation, responding to summoning circles drawn by careless mortals within the hour.</li>
+</ul>
+</section><section class="page-break-section level-4" data-section="2"><h4>Skills</h4>
+<p>
+<div class="flex-wrap">
+<div class="bubble">Demon Banishing</div>
+<div class="bubble">Spellcraft</div>
+<div class="bubble">Demon Dispatching</div>
+<div class="bubble">Grimoire Writing</div>
+<div class="bubble">Demonology</div>
+<div class="bubble">Udug Hul</div>
+<div class="bubble">Ancient Avestic Law</div>
+<div class="bubble">Maqlû</div>
+</div>
+</p>
+</section></section><section class="page-break-section level-3" data-section="3"><h3>Familiar Wrangler <br> <a href="">Mirewood Menagerie</a></h3>
+<blockquote>
+<p>
+<div class="row">
+<div class="column">Mirewood Bog, Eastern Marches</div>
+<div class="column"><em>March 2023 - March 2025</em></div>
+</div>
+</p>
+</blockquote>
+<section class="page-break-section level-4" data-section="4"><h4>Duties</h4>
+<ul>
+<li>Rehabilitated abandoned familiars, lifting lingering hexes and treating enchantment burnout.</li>
+<li>Designed a ward-based enclosure system that brought basilisk-related petrifications down to zero.</li>
+<li>Matched 200+ familiars (ravens, toads, cats, and one reluctant basilisk) with newly licensed apprentices, keeping a 97% bonding success rate.</li>
+<li>Trained menagerie staff in the safe handling of venomous and petrifying species.</li>
+</ul>
+</section><section class="page-break-section level-4" data-section="5"><h4>Skills</h4>
+<p>
+<div class="flex-wrap">
+<div class="bubble">Curse Reversal</div>
+<div class="bubble">Warding</div>
+<div class="bubble">Risk Mitigation</div>
+<div class="bubble">Mentorship</div>
+<div class="bubble">Animal Friendship</div>
+<div class="bubble">Stakeholder Management</div>
+<div class="bubble">Matter Shaping</div>
+<div class="bubble">Familiar Bonding</div>
+</div>
+</p>
+</section></section><section class="page-break-section level-3" data-section="6"><h3>Career Break</h3>
+<blockquote>
+<p>
+<div class="row">
+<div class="column">𒀭𒈾𒊏𒄠𒀭𒂗𒍪</div>
+<div class="column"><em>January 0722 - January 2023</em></div>
+</div>
+</p>
+</blockquote>
+<section class="page-break-section level-4" data-section="7"><h4>Goals</h4>
+<ul>
+<li>Ran a cell-block reading circle, teaching 40+ fellow inmates to read Old Enochian.</li>
+<li>Renewed my Wizarding Licence on release, completing the Ethics of Forbidden Magic refresher course.</li>
+<li>Served a 1,301-year dungeon sentence for casting forbidden spells and practising wizardry with an expired Wizarding Licence.</li>
+</ul>
+</section><section class="page-break-section level-4" data-section="8"><h4>Skills</h4>
+<p>
+<div class="flex-wrap">
+<div class="bubble">Old Enochian</div>
+<div class="bubble">Arcane Compliance</div>
+<div class="bubble">Mentorship</div>
+<div class="bubble">Teamwork</div>
+<div class="bubble">Meditation</div>
+</div>
+</p>
+</section></section><section class="page-break-section level-3" data-section="9"><h3>Djinn Negotiation Specialist <br> <a href="">J'Kast Kuthunm Consultants</a></h3>
+<blockquote>
+<p>
+<div class="row">
+<div class="column">جَنَّة</div>
+<div class="column"><em>June 0721 - December 0721</em></div>
+</div>
+</p>
+</blockquote>
+<section class="page-break-section level-4" data-section="10"><h4>Duties</h4>
+<ul>
+<li>Reversed curses left behind by poorly worded wishes made through other firms.</li>
+<li>Re-entombed djinn whose contracts had lapsed, returning them to their vessels without breach of terms.</li>
+<li>Proofread monkey's paw wishes for 150+ clients, minimizing unintentional consequences.</li>
+<li>Negotiated on behalf of clients with the Xhindi, ensuring fair dealings and enforceable terms.</li>
+</ul>
+</section><section class="page-break-section level-4" data-section="11"><h4>Skills</h4>
+<p>
+<div class="flex-wrap">
+<div class="bubble">Curse Reversal</div>
+<div class="bubble">Risk Mitigation</div>
+<div class="bubble">Djinn Entombment</div>
+<div class="bubble">Ancient Avestic Law</div>
+<div class="bubble">Wish Proofreading</div>
+<div class="bubble">Stakeholder Management</div>
+<div class="bubble">Contract Negotiation</div>
+<div class="bubble">Future Scrying</div>
+</div>
+</p>
+</section></section><section class="page-break-section level-3" data-section="12"><h3>Wizard's Assistant <br> <a href="">The Tower</a></h3>
+<blockquote>
+<p>
+<div class="row">
+<div class="column">5<sup>th</sup> Extra-dimensional Plane of Nonexistence</div>
+<div class="column"><em>June 0715 - May 0721</em></div>
+</div>
+</p>
+</blockquote>
+<section class="page-break-section level-4" data-section="13"><h4>Duties</h4>
+<ul>
+<li>Maintained the faculty's quarterly wards, renewing every sigil before the solstice.</li>
+<li>Assisted faculty wizard Dolo the Dastardly in daily affairs, from lecture preparation to curse removal.</li>
+<li>Acquired lesser magical artifacts for use in ritual sacrifice.</li>
+<li>Tamed failed golem abominations, training them to perform manual labour.</li>
+</ul>
+</section><section class="page-break-section level-4" data-section="14"><h4>Skills</h4>
+<p>
+<div class="flex-wrap">
+<div class="bubble">Curse Reversal</div>
+<div class="bubble">Warding</div>
+<div class="bubble">Spellcraft</div>
+<div class="bubble">Conducting Ritual Sacrifice</div>
+<div class="bubble">Matter Shaping</div>
+<div class="bubble">Stakeholder Management</div>
+<div class="bubble">Golemancy</div>
+<div class="bubble">Contract Negotiation</div>
+</div>
+</p>
+</section></section><h2>PROJECTS</h2>
+<section class="page-break-section level-3" data-section="15"><h3>Banishment Runbook</h3>
+<blockquote>
+<p>
+<div class="row">
+<div class="column">Professional</div>
+<div class="column"><em>June 2025 - Present</em></div>
+</div>
+</p>
+</blockquote>
+<p>A step-by-step grimoire for the taskforce covering identification, containment, and banishment of the twelve most common lesser demons, with a quick-reference table of the incantations each one is weak to.</p>
+<section class="page-break-section level-4" data-section="16"><h4>Skills</h4>
+<p>
+<div class="flex-wrap">
+<div class="bubble">Demon Banishing</div>
+<div class="bubble">Udug Hul</div>
+<div class="bubble">Grimoire Writing</div>
+<div class="bubble">Maqlû</div>
+<div class="bubble">Process Improvement</div>
+</div>
+</p>
+</section></section><section class="page-break-section level-3" data-section="17"><h3>Grimoire Index</h3>
+<blockquote>
+<p>
+<div class="row">
+<div class="column">Hobby</div>
+<div class="column"><em>June 2023 - Present</em></div>
+</div>
+</p>
+</blockquote>
+<p>A cross-referenced index of my grimoire collection, searchable by spell, author, and how badly each book bites.</p>
+<section class="page-break-section level-4" data-section="18"><h4>Skills</h4>
+<p>
+<div class="flex-wrap">
+<div class="bubble">Grimoire Writing</div>
+<div class="bubble">Old Enochian</div>
+</div>
+</p>
+</section></section><h2>EDUCATION</h2>
+<section class="page-break-section level-3" data-section="19"><h3>The Tower</h3>
+<blockquote>
+<p>
+<div class="row">
+<div class="column">5<sup>th</sup> Extra-dimensional Plane of Nonexistence</div>
+<div class="column">Wizard's Apprenticeship</div>
+</div>
+</p>
+</blockquote>
+<section class="page-break-section level-4" data-section="20"><h4>Skills</h4>
+<p>
+<div class="flex-wrap">
+<div class="bubble">Transfiguration</div>
+<div class="bubble">Spirit Summoning</div>
+<div class="bubble">Demon Summoning</div>
+<div class="bubble">Dueling</div>
+<div class="bubble">Prestidigitation</div>
+<div class="bubble">Animal Friendship</div>
+</div>
+</p>
+</section></section>
+</div>
+</body>
+</html>

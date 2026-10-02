@@ -164,6 +164,9 @@ class DataImporter:
                 f"Invalid type for {model.__name__}.{field_key}, "
                 f"expecting '{field_type}' '{scalar_types_str}' - got '{type(field_value)}'"
             )
+        if field_value is None:
+            coerced_data[field_key] = None
+            return
         try:
             coerced_data[field_key] = field_type(field_value)
         except TypeError as e:
